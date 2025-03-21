@@ -8,6 +8,15 @@ const mockGames = [
   { id: 1, title: 'Lucky Spin', image: '/images/game1.webp', rtp: '96.5%' },
   { id: 2, title: 'Crypto Dash', image: '/images/game2.webp', rtp: '96.5%' },
   { id: 3, title: 'Golden Dice', image: '/images/game3.webp', rtp: '96.5%' },
+  { id: 4, title: 'Golden Dice', image: '/images/game3.webp', rtp: '96.5%' },
+  { id: 5, title: 'Golden Dice', image: '/images/game3.webp', rtp: '96.5%' },
+  { id: 6, title: 'Golden Dice', image: '/images/game3.webp', rtp: '96.5%' },
+  { id: 7, title: 'Golden Dice', image: '/images/game3.webp', rtp: '96.5%' },
+  { id: 8, title: 'Golden Dice', image: '/images/game2.webp', rtp: '96.5%' },
+  { id: 9, title: 'Golden Dice', image: '/images/game1.webp', rtp: '96.5%' },
+  { id: 10, title: 'Golden Dice', image: '/images/game2.webp', rtp: '96.5%' },
+  { id: 11, title: 'Golden Dice', image: '/images/game3.webp', rtp: '96.5%' },
+  { id: 12, title: 'Golden Dice', image: '/images/game2.webp', rtp: '96.5%' },
 ];
 
 export default function HomePage() {
@@ -31,13 +40,13 @@ export default function HomePage() {
               </BreadcrumbList>
             </Breadcrumb>
           </header>
+          <main className="flex-1 p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {mockGames.map((game) => (
+              <GameCard key={game.id} game={game} />
+            ))}
+          </main>
         </SidebarInset>
       </SidebarProvider>
-      <main className="flex-1 p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {mockGames.map((game) => (
-          <GameCard key={game.id} game={game} />
-        ))}
-      </main>
     </div>
   );
 }
