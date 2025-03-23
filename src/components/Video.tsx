@@ -11,7 +11,7 @@ export default function Video() {
         <p className="font-bold">
           UP TO <span className="text-primary font-black">$20,000.00</span> in Casino
         </p>
-        <Button variant="default" className="font-bold mt-5 relative w-1/3">
+        <Button variant="default" className="font-bold mt-5 relative w-1/3 hover:bg-white">
           Join Now
         </Button>
       </div>

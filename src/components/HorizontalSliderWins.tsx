@@ -1,8 +1,9 @@
 'use client';
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
 import { CircleDollarSign } from 'lucide-react';
+import { getPlayers } from '@/lib/api/players';
 
 interface PlayerWin {
   id: number;
@@ -10,15 +11,36 @@ interface PlayerWin {
   playerName: string;
 }
 
-interface PlayerWinsSliderProps {
-  wins: PlayerWin[];
-}
-
 const animation = { duration: 15000, easing: (t: any) => t };
 
-export default function PlayerWinsSlider({ wins }: PlayerWinsSliderProps) {
-  const timer = useRef<number | null>(null);
-  const [sliderRef, slider] = useKeenSlider<HTMLDivElement>({
+export default function PlayerWinsSlider({}) {
+  const [wins, setPlayers] = useState<PlayerWin[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    console.log('init');
+
+    async function fetchData() {
+      try {
+        const data = await getPlayers();
+        const mappedPlayers: PlayerWin[] = data.map((player: any) => ({
+          id: player.id,
+          playerName: player.name,
+          winAmount: Math.floor(Math.random() * 10000),
+        }));
+        setPlayers(mappedPlayers);
+      } catch (err) {
+        setError('Failed to load players.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  const [sliderRef] = useKeenSlider<HTMLDivElement>({
     loop: true,
     renderMode: 'performance',
     drag: false,
@@ -45,17 +67,7 @@ export default function PlayerWinsSlider({ wins }: PlayerWinsSliderProps) {
     },
   });
 
-  const startAuto = () => {
-    timer.current = window.setInterval(() => {
-      slider.current?.next();
-    }, 2500);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (timer.current) clearInterval(timer.current);
-    };
-  }, []);
+  if (loading) return <div>Loading players...</div>;
 
   return (
     <header className="flex top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-2">
