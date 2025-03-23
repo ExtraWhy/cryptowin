@@ -2,9 +2,7 @@
 import { Dice5, Medal, Menu, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { AppSidebar } from '@/components/app-sidebar';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Separator } from '@/components/ui/separator';
-import { SidebarInset, SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
+import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 
 export default function Footer() {
   return (

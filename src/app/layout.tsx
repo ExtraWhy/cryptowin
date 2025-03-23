@@ -7,7 +7,7 @@ const oswald = Oswald({ subsets: ['latin'], variable: '--font-oswald' });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`oswald.variable`}>
+    <html lang="en" className={oswald.variable}>
       <body className={inter.className + ' bg-background text-foreground'}>
         {children}
         <Toaster />

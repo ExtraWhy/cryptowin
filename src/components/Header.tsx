@@ -1,6 +1,5 @@
 import { Coins } from 'lucide-react';
 import { AuthDialog } from './AuthDialog';
-import { LoginForm } from './login-form';
 
 export default function Header() {
   return (
