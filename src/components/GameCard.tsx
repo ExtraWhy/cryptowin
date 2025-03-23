@@ -17,7 +17,7 @@ export default function GameCard({ game }: GameCardProps) {
 
   const handleTouchStart = () => {
     if (videoRef.current) {
-      videoRef.current.play().catch((err: any) => {
+      videoRef.current.play().catch((err: Error) => {
         console.error('Error playing video:', err);
       });
     }
@@ -35,7 +35,7 @@ export default function GameCard({ game }: GameCardProps) {
     }
   };
 
-  const handleTouchCancel = (e: React.TouchEvent) => {
+  const handleTouchCancel = () => {
     if (videoRef.current) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0;

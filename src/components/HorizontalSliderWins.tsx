@@ -11,12 +11,24 @@ interface PlayerWin {
   playerName: string;
 }
 
-const animation = { duration: 15000, easing: (t: any) => t };
+interface PlayerData {
+  id: number;
+  name: string;
+}
+
+const animation = { duration: 15000, easing: (t: number) => t };
+
+const mockWins = [
+  { id: 1, winAmount: '1234', playerName: 'Lyubo F' },
+  { id: 2, winAmount: '12312', playerName: 'Lyubo K' },
+  { id: 3, winAmount: '918', playerName: 'Kuche' },
+  { id: 4, winAmount: '7894', playerName: 'Lyubo F' },
+  { id: 5, winAmount: '5324', playerName: 'Lyubo F' },
+];
 
 export default function PlayerWinsSlider({}) {
   const [wins, setPlayers] = useState<PlayerWin[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     console.log('init');
@@ -24,14 +36,15 @@ export default function PlayerWinsSlider({}) {
     async function fetchData() {
       try {
         const data = await getPlayers();
-        const mappedPlayers: PlayerWin[] = data.map((player: any) => ({
+        const mappedPlayers: PlayerWin[] = data.map((player: PlayerData) => ({
           id: player.id,
           playerName: player.name,
           winAmount: Math.floor(Math.random() * 10000),
         }));
         setPlayers(mappedPlayers);
       } catch (err) {
-        setError('Failed to load players.');
+        console.log('Failed to load, err: ', err);
+        setPlayers(mockWins);
       } finally {
         setLoading(false);
       }
