@@ -1,6 +1,5 @@
 import { Coins } from 'lucide-react';
-import { AuthDialog } from './AuthDialog';
-
+import AuthTrigger from '@/components/AuthTrigger';
 export default function Header() {
   return (
     <div className="flex sticky top-0 items-center h-16 md:h-20 bg-card border-b-1">
@@ -10,7 +9,8 @@ export default function Header() {
         </div>
         <span className="font-logo mb-0.5 animate-spin-slow">CRYPTOWIN</span>
       </div>
-      <AuthDialog />
+      <AuthTrigger text="Login" variant="outline" className="ml-auto mr-2" />
+      <AuthTrigger text="Sign Up" className="mr-2" />
     </div>
   );
 }
