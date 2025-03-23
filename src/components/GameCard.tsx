@@ -10,7 +10,7 @@ interface GameCardProps {
 export default function GameCard({ game }: GameCardProps) {
   return (
     <div
-      className="bg-gray-800 flex flex-col rounded-lg bg-cover bg-center overflow-hidden shadow-lg hover:shadow-yellow-400 transition"
+      className="min-h-50 bg-gray-800 flex flex-col rounded-lg bg-cover bg-center overflow-hidden shadow-md hover:shadow-yellow-400 transition"
       style={{ backgroundImage: `url(${game.image})` }}
     >
       <div className="p-4 block bg-gray-800/40 mt-auto">
