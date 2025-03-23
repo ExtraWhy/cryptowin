@@ -32,6 +32,7 @@ export default function HomePage() {
     <div className="min-h-screen">
       <Header />
       <PlayerWinsSlider wins={mockWins} />
+      <header className="flex top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4 p-3"></header>
       <Video />
       <div>
         <main className="flex-1 p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">

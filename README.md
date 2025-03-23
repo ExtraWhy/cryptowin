@@ -3,6 +3,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 ## Prerequisites
 node v18.19.0
 
+`nvm use 18.19.0`
+
 ## Getting Started
 
 First, run the development server:
