@@ -57,6 +57,8 @@ export default function GameCard({ game }: GameCardProps) {
         autoPlay
         loop
         muted
+        playsInline
+        webskit-playsinline="true"
         src={game.video}
       ></video>
 
