@@ -17,6 +17,7 @@ export default function GameCard({ game }: GameCardProps) {
 
   const handleTouchStart = () => {
     if (videoRef.current) {
+      videoRef.current.style.opacity = '1';
       videoRef.current.play().catch((err: Error) => {
         console.error('Error playing video:', err);
       });
@@ -31,6 +32,7 @@ export default function GameCard({ game }: GameCardProps) {
       } else if (videoRef.current) {
         videoRef.current.pause();
         videoRef.current.currentTime = 0;
+        videoRef.current.style.opacity = '0';
       }
     }
   };
@@ -39,6 +41,7 @@ export default function GameCard({ game }: GameCardProps) {
     if (videoRef.current) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
+      videoRef.current.style.opacity = '0';
     }
   };
 

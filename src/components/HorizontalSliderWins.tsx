@@ -88,7 +88,7 @@ export default function PlayerWinsSlider({}) {
         {wins.map((win) => (
           <div key={win.id} className="h-full border-red-50 px-3 p-1 keen-slider__slide bg-white/5 rounded shadow">
             <p className="text-xs">{win.playerName}</p>
-            <p className="text-gray-600 font-semibold">
+            <p className="text-sm text-gray-600 font-semibold">
               Won: <span className="text-white/80">{Number(win.winAmount).toLocaleString()}</span>
               <CircleDollarSign className="w-5 h-5 text-yellow-200 inline mb-1 ml-1" />
             </p>
