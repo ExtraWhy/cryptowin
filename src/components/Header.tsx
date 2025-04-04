@@ -29,8 +29,6 @@ export default function Header() {
         </div>
         <span className="font-logo mb-0.5 animate-spin-slow">CRYPTOWIN</span>
       </div>
-      <AuthTrigger text="Login" variant="outline" className="ml-auto mr-2" />
-      <AuthTrigger text="Sign Up" className="mr-2 md:mr-[2vw]" />
       {username === 'none' ? null : username ? (
         <div className="flex items-center gap-2 ml-auto mr-4">
           <img src={photo} className="w-8 h-8 rounded-full" alt="User" />
