@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-logo: var(--font-oswald), "sand-serif";
+  --font-logo: var(--font-oswald), 'sand-serif';
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -44,7 +44,6 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-
 :root {
   --radius: 0.625rem;
 
@@ -81,8 +80,8 @@
 
   /* Borders, inputs, rings */
   --border: oklch(30% 0.01 260); /* subtle border */
-  --input: oklch(22% 0.01 260);  /* input fields */
-  --ring: oklch(80% 0.2 85);     /* gold ring */
+  --input: oklch(22% 0.01 260); /* input fields */
+  --ring: oklch(80% 0.2 85); /* gold ring */
 
   /* Charts (optional colors) */
   --chart-1: oklch(60% 0.2 85);
@@ -101,7 +100,6 @@
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ring);
 }
-
 
 .dark {
   --background: oklch(0.13 0.028 261.692);

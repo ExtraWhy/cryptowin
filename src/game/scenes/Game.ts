@@ -1,14 +1,17 @@
 import { Scene, Display } from 'phaser';
+import Stats from 'stats.js';
 
 export class Game extends Scene {
-  private spinning: boolean = true;
+  private spinning: boolean = false;
   private reelCount: number = 5;
   private symbolsPerReel: number = 10;
+  private symbolHeight: number = 100;
   private symbolsYSpacing: number = 30;
-  private reelSpacing: number = 150;
+  private reelSpacing: number = 140;
   private startY: number = 0;
   private winningLineY: number = 300; // Global Y coordinate for the winning symbol
   private spinSpeed: number = 15;
+  private stats = new Stats();
   private coinSymbols: string[] = [
     'bitcoin.png',
     'dogecoin.png',
@@ -31,18 +34,39 @@ export class Game extends Scene {
 
   create() {
     console.log('create');
+
+    // stats
+    this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb
+    this.stats.dom.style.position = 'absolute';
+    document.getElementById('game-container')?.appendChild(this.stats.dom);
+    // end stats
+
+    const graphics = this.add.graphics();
+    const overlay = new Phaser.GameObjects.Graphics(this);
+    graphics.fillStyle(0x15130f, 1);
+    overlay.lineStyle(2, 0x383838, 1);
+    overlay.fillStyle(0x15130f, 1);
+
     for (let i = 0; i < this.reelCount; i++) {
-      const container = this.add.container(100 + i * this.reelSpacing, this.startY);
+      graphics.fillRoundedRect(12 + i * this.reelSpacing, 0, 132, 413, 10);
+      const container = this.add.container(80 + i * this.reelSpacing, this.startY);
       for (let j = 0; j < this.symbolsPerReel; j++) {
         const frameName = Phaser.Utils.Array.GetRandom(this.coinSymbols);
-        const sprite = this.add.sprite(0, j * (this.symbolHeight() + this.symbolsYSpacing), 'symbols', frameName);
+        const sprite = this.add.sprite(0, j * (this.symbolHeight + this.symbolsYSpacing), 'symbols', frameName);
         container.add(sprite);
       }
+
+      overlay.fillRoundedRect(12 + i * this.reelSpacing, 0, 132, 21, 10);
+      overlay.fillRoundedRect(12 + i * this.reelSpacing, 391, 132, 21, 10);
+
+      overlay.strokeRoundedRect(12 + i * this.reelSpacing, 0, 132, 413, 10);
       this.reels.push(container);
     }
 
-    this.add.rectangle(0, this.scale.height - 200, this.scale.width, 200, this.sys.game.config.backgroundColor.color).setOrigin(0, 0);
-    this.add.rectangle(0, 0, this.scale.width, 200, this.sys.game.config.backgroundColor.color).setOrigin(0, 0);
+    this.add.existing(overlay);
+
+    //this.add.rectangle(0, this.scale.height - 155, this.scale.width, 200, this.sys.game.config.backgroundColor.color).setOrigin(0, 0);
+    //this.add.rectangle(0, 0, this.scale.width, 200, this.sys.game.config.backgroundColor.color).setOrigin(0, 0);
     this.input.on(
       'pointerdown',
       () => {
@@ -57,6 +81,9 @@ export class Game extends Scene {
   }
 
   update() {
+    if (this.stats) this.stats.begin();
+    if (this.stats) this.stats.end();
+
     if (this.spinning) {
       const gameHeight = Number(this.sys.game.config.height);
       this.reels.forEach((container) => {
@@ -65,16 +92,12 @@ export class Game extends Scene {
         container.list
           .filter((child): child is Phaser.GameObjects.Sprite => child instanceof Phaser.GameObjects.Sprite)
           .forEach((sprite) => {
-            if (container.y + sprite.y >= gameHeight + this.symbolHeight()) {
-              sprite.y -= this.symbolsPerReel * (this.symbolHeight() + this.symbolsYSpacing);
+            if (container.y + sprite.y >= gameHeight + this.symbolHeight) {
+              sprite.y -= this.symbolsPerReel * (this.symbolHeight + this.symbolsYSpacing);
             }
           });
       });
     }
-  }
-
-  private symbolHeight(): number {
-    return 100;
   }
 
   stopSpin() {
