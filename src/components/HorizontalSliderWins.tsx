@@ -58,6 +58,7 @@ const MutationPlugin: KeenSliderPlugin = (slider) => {
 
 export default function PlayerWinsSlider({}) {
   const wins = useRef<PlayerWin[]>([]);
+  const players_filled = useRef<Boolean>(false);
   const [slideDetails, setSlidesDetails] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -90,8 +91,12 @@ export default function PlayerWinsSlider({}) {
         wins.current = [...wins.current, ...mappedPlayers];
       } catch (err) {
         console.log('Failed to load, err: ', err);
-        wins.current = mockWins;
+        if (!players_filled.current) {
+          wins.current = mockWins;
+          console.log(wins.current);
+        }
       } finally {
+        players_filled.current = true;
         setLoading(false);
       }
     }
