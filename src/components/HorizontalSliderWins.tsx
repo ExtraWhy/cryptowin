@@ -7,7 +7,6 @@ import { getPlayers } from '@/lib/api/players';
 
 // Final frontend type
 interface PlayerWin {
-  id: number;
   winAmount: string;
   playerName: string;
 }
@@ -23,21 +22,21 @@ const SLIDES_COUNT = 11;
 const animation = { duration: 15000, easing: (t: number) => t };
 
 const mockWins = [
-  { id: 124, winAmount: '123', playerName: 'Lyubo F1' },
-  { id: 125, winAmount: '123', playerName: 'Lyubo K2' },
-  { id: 126, winAmount: '123', playerName: 'Kuche' },
-  { id: 127, winAmount: '123', playerName: 'Lyubo F3' },
-  { id: 128, winAmount: '123', playerName: 'Lyubo F4' },
-  { id: 129, winAmount: '123', playerName: 'Lyubo Z0' },
-  { id: 130, winAmount: '123', playerName: 'Lyubo K3' },
-  { id: 131, winAmount: '123', playerName: 'Kuche 2' },
-  { id: 132, winAmount: '123', playerName: 'Lyubo F11' },
-  { id: 133, winAmount: '123', playerName: 'Lyubo F12' },
-  { id: 134, winAmount: '123', playerName: 'Lyubo Z1' },
-  { id: 135, winAmount: '123', playerName: 'Lyubo Z2' },
-  { id: 136, winAmount: '123', playerName: 'Lyubo Z3' },
-  { id: 137, winAmount: '123', playerName: 'Lyubo Z4' },
-  { id: 138, winAmount: '123', playerName: 'Lyubo Z5' },
+  { winAmount: '123', playerName: 'Lyubo F1' },
+  { winAmount: '123', playerName: 'Lyubo K2' },
+  { winAmount: '123', playerName: 'Kuche' },
+  { winAmount: '123', playerName: 'Lyubo F3' },
+  { winAmount: '123', playerName: 'Lyubo F4' },
+  { winAmount: '123', playerName: 'Lyubo Z0' },
+  { winAmount: '123', playerName: 'Lyubo K3' },
+  { winAmount: '123', playerName: 'Kuche 2' },
+  { winAmount: '123', playerName: 'Lyubo F11' },
+  { winAmount: '123', playerName: 'Lyubo F12' },
+  { winAmount: '123', playerName: 'Lyubo Z1' },
+  { winAmount: '123', playerName: 'Lyubo Z2' },
+  { winAmount: '123', playerName: 'Lyubo Z3' },
+  { winAmount: '123', playerName: 'Lyubo Z4' },
+  { winAmount: '123', playerName: 'Lyubo Z5' },
 ];
 
 const MutationPlugin: KeenSliderPlugin = (slider) => {
@@ -59,6 +58,7 @@ const MutationPlugin: KeenSliderPlugin = (slider) => {
 export default function PlayerWinsSlider({}) {
   const wins = useRef<PlayerWin[]>([]);
   const players_filled = useRef<Boolean>(false);
+  const batch_id = useRef<number>(0);
   const [slideDetails, setSlidesDetails] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -66,7 +66,10 @@ export default function PlayerWinsSlider({}) {
     async function fetchData() {
       try {
         const data = await getPlayers();
-        console.log('server data', data);
+        //const data = [{ id: 8, money: '25', name: 'Bonbonev' }];
+        const date = new Date();
+        batch_id.current += 1;
+        console.log('batch id: ', batch_id.current, 'min:sec', date.getMinutes() + ':' + date.getSeconds(), 'server data', data);
         /*
         const data: PlayerData[] = (() => {
           // Generate a random integer from 0 to 5
@@ -83,17 +86,20 @@ export default function PlayerWinsSlider({}) {
         */
 
         const mappedPlayers: PlayerWin[] = data.map((player: PlayerData) => ({
-          id: player.id,
           playerName: player.name,
           winAmount: player.money.toString(),
         }));
+
+        mappedPlayers.unshift({
+          playerName: 'batch id ' + batch_id.current.toString() + ' ' + date.getMinutes() + ':' + date.getSeconds(),
+          winAmount: 'NaN',
+        });
 
         wins.current = [...wins.current, ...mappedPlayers];
       } catch (err) {
         console.log('Failed to load, err: ', err);
         if (!players_filled.current) {
           wins.current = mockWins;
-          console.log(wins.current);
         }
       } finally {
         players_filled.current = true;
