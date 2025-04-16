@@ -1,3 +1,4 @@
+import WebSocketManager, { ServerMessage } from '@/lib/ws';
 import { Scene, Display } from 'phaser';
 import Stats from 'stats.js';
 
@@ -51,6 +52,9 @@ export class Game extends Scene {
   private onUpdate: (() => void) | null = null;
 
   private slot_machine!: FiniteStateMachine;
+  private ws = WebSocketManager();
+  private wsm: Phaser.GameObjects.Text;
+  private wss: Phaser.GameObjects.Graphics;
 
   constructor() {
     super('Game');
@@ -114,6 +118,7 @@ export class Game extends Scene {
   }
 
   create() {
+    this.ws.connect('ws://localhost:8081/ws');
     // stats
     this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb
     this.stats.dom.style.position = 'absolute';
@@ -170,6 +175,14 @@ export class Game extends Scene {
     //this.add.rectangle(0, this.scale.height - 155, this.scale.width, 200, this.sys.game.config.backgroundColor.color).setOrigin(0, 0);
     //this.add.rectangle(0, 0, this.scale.width, 200, this.sys.game.config.backgroundColor.color).setOrigin(0, 0);
     this.input.on('pointerdown', () => this.send(SlotMachineEvent.TOGGLE), this);
+    this.wsm = this.add.text(100, 124, '', {
+      fontSize: '28px',
+      color: '#ffffff',
+    });
+    this.wsm.setVisible(false);
+    this.wss = new Phaser.GameObjects.Graphics(this);
+    this.wss.y = 40;
+    this.add.existing(this.wss);
   }
 
   resetAllReels() {
@@ -196,6 +209,7 @@ export class Game extends Scene {
       });
     });
     this.send(SlotMachineEvent.RESET_COMPLETE);
+    this.wsm.setVisible(true);
   }
 
   spinAllReels() {
@@ -203,6 +217,38 @@ export class Game extends Scene {
     const acceleration = 0.9; // how fast it reaches max speed
     const nudgeOffset = 21;
     const delayBetweenReels = 20;
+    let socket_received: boolean = false;
+    let tweens_completed: boolean = false;
+    this.wsm.setVisible(false);
+    this.wss.clear();
+    this.wss.fillStyle(0xf5bc42, 1);
+    this.wss.fillRoundedRect(0, 0, 50, 50, 3);
+
+    const checkForMovingOn = () => {
+      if (socket_received && tweens_completed) {
+        console.log('check for moving on', this);
+        this.send(SlotMachineEvent.START_COMPLETE);
+      }
+    };
+
+    this.ws.onMessage((data: ServerMessage) => {
+      this.wss.clear();
+      this.wss.fillStyle(0x00ff00);
+      this.wss.fillRoundedRect(0, 0, 50, 50, 3);
+      console.log('🎯 Raw server data:', data);
+
+      const text = data.won > 0 ? `🎉 You won ${data.won} coins!` : `😢 Better luck next time.`;
+      this.wsm.setText(text);
+
+      socket_received = true;
+      checkForMovingOn();
+    });
+
+    this.ws.send({
+      id: 7,
+      money: 100,
+    });
+
     this.drawWinningSymbols();
     //this.tweens.killAll();
     this.reels.forEach((reel, index) => {
@@ -223,7 +269,9 @@ export class Game extends Scene {
       }).then(() => {
         if (index === 0) this.onUpdate = this.updateSpinning;
         if (index === this.reels.length - 1) {
-          this.send(SlotMachineEvent.START_COMPLETE);
+          tweens_completed = true;
+          checkForMovingOn();
+          //this.send(SlotMachineEvent.START_COMPLETE);
         }
       });
     });
@@ -311,7 +359,7 @@ export class Game extends Scene {
           this.tweenPromise({
             targets: container,
             y: initialY - 21,
-            duration: 80,
+            duration: 30,
             ease: 'Sine.easeOut',
             onComplete: () => {
               //if (index === this.reels.length - 1) this.resetAllReels();
@@ -329,7 +377,7 @@ export class Game extends Scene {
   stopAllReels() {
     this.onUpdate = this.updateStopping;
     this.reels.forEach((reel, index) => {
-      this.time.delayedCall(index * 80, () => {
+      this.time.delayedCall(index * 30, () => {
         reel.speed = reel.maxSpeed;
         reel.stopping = true;
       });
