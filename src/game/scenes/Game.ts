@@ -7,6 +7,7 @@ enum SlotMachineEvent {
   TOGGLE,
   START_COMPLETE,
   STOP_START,
+  STOP_SPIN,
   STOP_COMPLETE,
   RESET_COMPLETE,
 }
@@ -53,8 +54,8 @@ export class Game extends Scene {
 
   private slot_machine!: FiniteStateMachine;
   private ws = WebSocketManager();
-  private wsm: Phaser.GameObjects.Text;
-  private wss: Phaser.GameObjects.Graphics;
+  private wsm!: Phaser.GameObjects.Text;
+  private wss!: Phaser.GameObjects.Graphics;
 
   constructor() {
     super('Game');
@@ -67,12 +68,20 @@ export class Game extends Scene {
       states: {
         idle: {
           TOGGLE: 'starting',
+          entry: () =>
+            this.time.delayedCall(100, () => {
+              this.send(SlotMachineEvent.TOGGLE);
+            }),
         },
         starting: {
           entry: () => this.spinAllReels(),
           START_COMPLETE: 'spinning',
         },
         spinning: {
+          entry: () =>
+            this.time.delayedCall(1000, () => {
+              this.send(SlotMachineEvent.STOP_SPIN);
+            }),
           STOP_SPIN: 'stopping',
           TOGGLE: 'stopping',
         },
@@ -245,7 +254,7 @@ export class Game extends Scene {
     });
 
     this.ws.send({
-      id: 7,
+      id: 1,
       money: 100,
     });
 
@@ -376,6 +385,7 @@ export class Game extends Scene {
 
   stopAllReels() {
     this.onUpdate = this.updateStopping;
+    this.time.removeAllEvents();
     this.reels.forEach((reel, index) => {
       this.time.delayedCall(index * 30, () => {
         reel.speed = reel.maxSpeed;
