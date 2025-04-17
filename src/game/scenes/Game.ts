@@ -27,7 +27,6 @@ interface Reel {
 }
 
 export class Game extends Scene {
-  private spinning: boolean = false;
   private reelCount: number = 5;
   private symbolsPerReel: number = 7;
   private symbolHeight: number = 100;
@@ -41,13 +40,35 @@ export class Game extends Scene {
     'dogecoin.png',
     'pepe-pepe-logo.png',
     'usd-coin-usdc-logo.png',
-    'xrp-xrp-logo.png',
     'tether-usdt-logo.png',
     'solana-sol-logo.png',
+    'symbol2.png',
+    'xrp-xrp-logo.png',
+    '7.png',
+    '9.png',
+    '10.png',
+    't.png',
+    'j.png',
+    'ethereumq.png',
+    'bitcoin10.png',
   ];
   private reels: Reel[] = [];
 
+  private lines: number[][] = [
+    [1, 1, 1, 1, 1], // 0
+    [0, 0, 0, 0, 0], // 1
+    [2, 2, 2, 2, 2], // 2
+    [0, 1, 2, 1, 0], // 3
+    [2, 1, 0, 1, 2], // 4
+    [0, 0, 1, 2, 2], // 5
+    [2, 2, 1, 0, 0], // 6
+    [1, 0, 1, 2, 1], // 7
+    [1, 2, 1, 0, 1], // 8
+    [0, 1, 1, 1, 2], // 9
+  ];
+
   private reelResults: string[] = [];
+  private winningLines: number[] = [];
   private spaceKey!: Phaser.Input.Keyboard.Key;
 
   private onUpdate: (() => void) | null = null;
@@ -69,7 +90,7 @@ export class Game extends Scene {
         idle: {
           TOGGLE: 'starting',
           entry: () =>
-            this.time.delayedCall(100, () => {
+            this.time.delayedCall(3000, () => {
               this.send(SlotMachineEvent.TOGGLE);
             }),
         },
@@ -97,7 +118,7 @@ export class Game extends Scene {
     };
   }
 
-  drawWinningSymbols() {
+  drawRandomWinningSymbols() {
     this.reelResults = Array.from({ length: 15 }, () => {
       const randomIndex = Math.floor(Math.random() * this.coinSymbols.length);
       return this.coinSymbols[randomIndex];
@@ -114,16 +135,11 @@ export class Game extends Scene {
       return;
     }
 
-    console.log(`Transition: ${this.slot_machine.current_state} -> ${nextState} on ${event}`);
+    //console.log(`Transition: ${this.slot_machine.current_state} -> ${nextState} on ${event}`);
     this.slot_machine.current_state = nextState;
 
     const entryEffect = this.slot_machine.states[nextState]?.entry;
     if (typeof entryEffect === 'function') entryEffect();
-  }
-
-  preload() {
-    // In Next.js, place your assets in the public folder.
-    this.load.atlas('symbols', '/assets/spritesheet.png', '/assets/spritesheet.json');
   }
 
   create() {
@@ -196,22 +212,43 @@ export class Game extends Scene {
 
   resetAllReels() {
     let result_texture_index = 0;
-    this.reels.forEach((reel) => {
+    this.reels.forEach((reel, reel_index) => {
       const { container } = reel;
       reel.replacedFrames = false;
       reel.stopping = false;
       let posY: number = -3 * (this.symbolHeight + this.symbolsYSpacing) + this.startY;
       container.y = posY;
 
-      (container.list as Phaser.GameObjects.Sprite[]).forEach((sprite: Phaser.GameObjects.Sprite, i: number) => {
-        const symbolY = i * (this.symbolHeight + this.symbolsYSpacing);
+      (container.list as Phaser.GameObjects.Sprite[]).forEach((sprite: Phaser.GameObjects.Sprite, col_index: number) => {
+        const symbolY = col_index * (this.symbolHeight + this.symbolsYSpacing);
 
         sprite.y = symbolY;
         (sprite as any).stopPosition = null;
         //if ( sprite.y )
         let randomTexture = Phaser.Utils.Array.GetRandom(this.coinSymbols);
-        if (i >= container.list.length - 3) {
-          randomTexture = this.reelResults[result_texture_index++];
+        let flashing_indexes: number[] = [];
+        if (col_index >= container.list.length - 3) {
+          randomTexture = this.reelResults[reel_index * 3 + col_index - (container.list.length - 3)];
+          // 1,2,1,2,1
+          if (this.winningLines.length) {
+            this.winningLines.map((line: number) => {
+              console.log(this.lines[line][reel_index], col_index - (container.list.length - 3));
+              if (this.lines[line][reel_index] == col_index - (container.list.length - 3)) {
+                console.log('matching index');
+                //flashing_indexes.push(sprite)
+
+                this.tweenPromise({
+                  targets: sprite,
+                  scale: { from: 1, to: 1.2 },
+                  angle: { from: -20, to: 20 },
+                  duration: 800,
+                  ease: 'Sine.easeInOut',
+                  yoyo: true,
+                  repeat: -1,
+                });
+              }
+            });
+          }
           //randomTexture = 'dogecoin.png';
         }
         sprite.setTexture('symbols', randomTexture);
@@ -219,6 +256,7 @@ export class Game extends Scene {
     });
     this.send(SlotMachineEvent.RESET_COMPLETE);
     this.wsm.setVisible(true);
+    this.winningLines = [];
   }
 
   spinAllReels() {
@@ -233,9 +271,8 @@ export class Game extends Scene {
     this.wss.fillStyle(0xf5bc42, 1);
     this.wss.fillRoundedRect(0, 0, 50, 50, 3);
 
-    const checkForMovingOn = () => {
+    const checkForStartComplete = () => {
       if (socket_received && tweens_completed) {
-        console.log('check for moving on', this);
         this.send(SlotMachineEvent.START_COMPLETE);
       }
     };
@@ -244,13 +281,30 @@ export class Game extends Scene {
       this.wss.clear();
       this.wss.fillStyle(0x00ff00);
       this.wss.fillRoundedRect(0, 0, 50, 50, 3);
-      console.log('🎯 Raw server data:', data);
+
+      const binary_reels = atob(data.reels);
+      const symbols: number[] = [];
+      for (let i = 0; i < binary_reels.length; i++) {
+        symbols.push(binary_reels.charCodeAt(i));
+      }
+      console.log('symbold', symbols);
+
+      this.reelResults = Array.from({ length: 15 }, (_, i) => {
+        const col = i % 3;
+        const row = Math.floor(i / 3);
+        return this.coinSymbols[symbols[col * 5 + row]];
+      });
+      console.log('results', this.reelResults);
+      if (data.lines) {
+        this.winningLines = [...atob(data.lines)].map((char) => char.charCodeAt(0));
+      }
+      console.log('winninglines', this.winningLines);
 
       const text = data.won > 0 ? `🎉 You won ${data.won} coins!` : `😢 Better luck next time.`;
       this.wsm.setText(text);
 
       socket_received = true;
-      checkForMovingOn();
+      checkForStartComplete();
     });
 
     this.ws.send({
@@ -258,8 +312,8 @@ export class Game extends Scene {
       money: 100,
     });
 
-    this.drawWinningSymbols();
-    //this.tweens.killAll();
+    //this.drawRandomWinningSymbols();
+    this.tweens.killAll();
     this.reels.forEach((reel, index) => {
       reel.speed = 0;
       reel.maxSpeed = maxSpeed;
@@ -279,7 +333,7 @@ export class Game extends Scene {
         if (index === 0) this.onUpdate = this.updateSpinning;
         if (index === this.reels.length - 1) {
           tweens_completed = true;
-          checkForMovingOn();
+          checkForStartComplete();
           //this.send(SlotMachineEvent.START_COMPLETE);
         }
       });

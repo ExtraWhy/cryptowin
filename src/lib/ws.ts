@@ -3,7 +3,8 @@
 export type ServerMessage = {
   won: number;
   name: string;
-  lines: unknown; // or a more specific type if you know it
+  lines: string; // or a more specific type if you know it
+  reels: string;
 };
 
 let socket: WebSocket | null = null;
@@ -32,7 +33,7 @@ export default function WebSocketManager() {
             listener(data);
           }
         } catch (err) {
-          console.error('[WS] Failed to parse raw message:', event.data);
+          console.error('[WS] Failed to parse raw message:', event.data, err);
         }
       });
 
