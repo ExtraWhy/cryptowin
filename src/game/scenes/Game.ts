@@ -76,6 +76,7 @@ export class Game extends Scene {
   private slot_machine!: FiniteStateMachine;
   private ws = WebSocketManager();
   private wsm!: Phaser.GameObjects.Text;
+  private ws_timer!: Phaser.GameObjects.Text;
   private wss!: Phaser.GameObjects.Graphics;
 
   constructor() {
@@ -131,7 +132,9 @@ export class Game extends Scene {
     const nextState: SlotState = stateDef?.[event];
 
     if (!nextState) {
-      console.warn(`Invalid transition: ${this.slot_machine.current_state} -> ${event}`);
+      console.warn(
+        `Invalid transition: ${this.slot_machine.current_state} -> ${event}`,
+      );
       return;
     }
 
@@ -143,7 +146,8 @@ export class Game extends Scene {
   }
 
   create() {
-    this.ws.connect('ws://localhost:8081/ws');
+    console.log('abase_scene.onUpdate = spinsdf');
+    //this.ws.connect('ws://localhost:8081/ws');
     // stats
     this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb
     this.stats.dom.style.position = 'absolute';
@@ -158,7 +162,8 @@ export class Game extends Scene {
 
     for (let i = 0; i < this.reelCount; i++) {
       //graphics.fillRoundedRect(12 + i * this.reelSpacing, 0, 132, 413, 10);
-      let posY: number = -3 * (this.symbolHeight + this.symbolsYSpacing) + this.startY;
+      let posY: number =
+        -3 * (this.symbolHeight + this.symbolsYSpacing) + this.startY;
 
       const container = this.add.container(80 + i * this.reelSpacing, posY);
       for (let j = 0; j < this.symbolsPerReel; j++) {
@@ -180,7 +185,8 @@ export class Game extends Scene {
         maxSpeed: 0,
         replacedFrames: false,
         stopping: false,
-        height: (this.reelCount + 2) * (this.symbolHeight + this.symbolsYSpacing),
+        height:
+          (this.reelCount + 2) * (this.symbolHeight + this.symbolsYSpacing),
       });
     }
 
@@ -191,7 +197,9 @@ export class Game extends Scene {
       }
     });
     if (this.input && this.input.keyboard) {
-      this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+      this.spaceKey = this.input.keyboard.addKey(
+        Phaser.Input.Keyboard.KeyCodes.SPACE,
+      );
       this.spaceKey.on('down', () => this.send(SlotMachineEvent.TOGGLE), this);
     }
 
@@ -199,7 +207,11 @@ export class Game extends Scene {
 
     //this.add.rectangle(0, this.scale.height - 155, this.scale.width, 200, this.sys.game.config.backgroundColor.color).setOrigin(0, 0);
     //this.add.rectangle(0, 0, this.scale.width, 200, this.sys.game.config.backgroundColor.color).setOrigin(0, 0);
-    this.input.on('pointerdown', () => this.send(SlotMachineEvent.TOGGLE), this);
+    this.input.on(
+      'pointerdown',
+      () => this.send(SlotMachineEvent.TOGGLE),
+      this,
+    );
     this.wsm = this.add.text(100, 124, '', {
       fontSize: '28px',
       color: '#ffffff',
@@ -208,6 +220,10 @@ export class Game extends Scene {
     this.wss = new Phaser.GameObjects.Graphics(this);
     this.wss.y = 40;
     this.add.existing(this.wss);
+    this.ws_timer = this.add.text(100, 124, '', {
+      fontSize: '28px',
+      color: '#ffffff',
+    });
   }
 
   resetAllReels() {
@@ -216,43 +232,56 @@ export class Game extends Scene {
       const { container } = reel;
       reel.replacedFrames = false;
       reel.stopping = false;
-      let posY: number = -3 * (this.symbolHeight + this.symbolsYSpacing) + this.startY;
+      let posY: number =
+        -3 * (this.symbolHeight + this.symbolsYSpacing) + this.startY;
       container.y = posY;
 
-      (container.list as Phaser.GameObjects.Sprite[]).forEach((sprite: Phaser.GameObjects.Sprite, col_index: number) => {
-        const symbolY = col_index * (this.symbolHeight + this.symbolsYSpacing);
+      (container.list as Phaser.GameObjects.Sprite[]).forEach(
+        (sprite: Phaser.GameObjects.Sprite, col_index: number) => {
+          const symbolY =
+            col_index * (this.symbolHeight + this.symbolsYSpacing);
 
-        sprite.y = symbolY;
-        (sprite as any).stopPosition = null;
-        //if ( sprite.y )
-        let randomTexture = Phaser.Utils.Array.GetRandom(this.coinSymbols);
-        let flashing_indexes: number[] = [];
-        if (col_index >= container.list.length - 3) {
-          randomTexture = this.reelResults[reel_index * 3 + col_index - (container.list.length - 3)];
-          // 1,2,1,2,1
-          if (this.winningLines.length) {
-            this.winningLines.map((line: number) => {
-              console.log(this.lines[line][reel_index], col_index - (container.list.length - 3));
-              if (this.lines[line][reel_index] == col_index - (container.list.length - 3)) {
-                console.log('matching index');
-                //flashing_indexes.push(sprite)
+          sprite.y = symbolY;
+          (sprite as any).stopPosition = null;
+          //if ( sprite.y )
+          let randomTexture = Phaser.Utils.Array.GetRandom(this.coinSymbols);
+          let flashing_indexes: number[] = [];
+          if (col_index >= container.list.length - 3) {
+            randomTexture =
+              this.reelResults[
+                reel_index * 3 + col_index - (container.list.length - 3)
+              ];
+            // 1,2,1,2,1
+            if (this.winningLines.length) {
+              this.winningLines.map((line: number) => {
+                console.log(
+                  this.lines[line][reel_index],
+                  col_index - (container.list.length - 3),
+                );
+                if (
+                  this.lines[line][reel_index] ==
+                  col_index - (container.list.length - 3)
+                ) {
+                  console.log('matching index');
+                  //flashing_indexes.push(sprite)
 
-                this.tweenPromise({
-                  targets: sprite,
-                  scale: { from: 1, to: 1.2 },
-                  angle: { from: -20, to: 20 },
-                  duration: 800,
-                  ease: 'Sine.easeInOut',
-                  yoyo: true,
-                  repeat: -1,
-                });
-              }
-            });
+                  this.tweenPromise({
+                    targets: sprite,
+                    scale: { from: 1, to: 1.2 },
+                    angle: { from: -20, to: 20 },
+                    duration: 800,
+                    ease: 'Sine.easeInOut',
+                    yoyo: true,
+                    repeat: -1,
+                  });
+                }
+              });
+            }
+            //randomTexture = 'dogecoin.png';
           }
-          //randomTexture = 'dogecoin.png';
-        }
-        sprite.setTexture('symbols', randomTexture);
-      });
+          sprite.setTexture('symbols', randomTexture);
+        },
+      );
     });
     this.send(SlotMachineEvent.RESET_COMPLETE);
     this.wsm.setVisible(true);
@@ -271,6 +300,13 @@ export class Game extends Scene {
     this.wss.fillStyle(0xf5bc42, 1);
     this.wss.fillRoundedRect(0, 0, 50, 50, 3);
 
+    let handle: number;
+    const end = performance.now();
+    const updateText = () => {
+      this.ws_timer.setText('ms ' + String(performance.now() - end));
+      handle = requestAnimationFrame(updateText);
+    };
+    requestAnimationFrame(updateText);
     const checkForStartComplete = () => {
       if (socket_received && tweens_completed) {
         this.send(SlotMachineEvent.START_COMPLETE);
@@ -281,6 +317,8 @@ export class Game extends Scene {
       this.wss.clear();
       this.wss.fillStyle(0x00ff00);
       this.wss.fillRoundedRect(0, 0, 50, 50, 3);
+      cancelAnimationFrame(handle);
+      this.ws_timer.setText('ms ' + String(performance.now() - end));
 
       const binary_reels = atob(data.reels);
       const symbols: number[] = [];
@@ -296,11 +334,16 @@ export class Game extends Scene {
       });
       console.log('results', this.reelResults);
       if (data.lines) {
-        this.winningLines = [...atob(data.lines)].map((char) => char.charCodeAt(0));
+        this.winningLines = [...atob(data.lines)].map((char) =>
+          char.charCodeAt(0),
+        );
       }
       console.log('winninglines', this.winningLines);
 
-      const text = data.won > 0 ? `🎉 You won ${data.won} coins!` : `😢 Better luck next time.`;
+      const text =
+        data.won > 0
+          ? `🎉 You won ${data.won} coins!`
+          : `😢 Better luck next time.`;
       this.wsm.setText(text);
 
       socket_received = true;
@@ -312,7 +355,7 @@ export class Game extends Scene {
       money: 100,
     });
 
-    //this.drawRandomWinningSymbols();
+    //();
     this.tweens.killAll();
     this.reels.forEach((reel, index) => {
       reel.speed = 0;
@@ -362,19 +405,28 @@ export class Game extends Scene {
   shiftSymbols(reel: Reel, shiftToTop: boolean = true) {
     const { container } = reel;
     let outsideSprite: Phaser.GameObjects.Sprite | null = null;
-    (container.list as Phaser.GameObjects.Sprite[]).forEach((sprite: Phaser.GameObjects.Sprite) => {
-      sprite.y += reel.speed;
+    (container.list as Phaser.GameObjects.Sprite[]).forEach(
+      (sprite: Phaser.GameObjects.Sprite) => {
+        sprite.y += reel.speed;
 
-      if (sprite.y >= reel.height) {
-        outsideSprite = sprite;
-        let randomTexture = Phaser.Utils.Array.GetRandom(this.coinSymbols);
-        outsideSprite.setTexture('symbols', randomTexture);
-      }
-    });
+        if (sprite.y >= reel.height) {
+          outsideSprite = sprite;
+          let randomTexture = Phaser.Utils.Array.GetRandom(this.coinSymbols);
+          outsideSprite.setTexture('symbols', randomTexture);
+        }
+      },
+    );
 
-    const minY = Math.min(...container.list.map((s) => (s as Phaser.GameObjects.Sprite).y));
-    if (shiftToTop && outsideSprite && (outsideSprite as Phaser.GameObjects.Sprite).y) {
-      (outsideSprite as Phaser.GameObjects.Sprite).y = minY - this.symbolHeight - this.symbolsYSpacing;
+    const minY = Math.min(
+      ...container.list.map((s) => (s as Phaser.GameObjects.Sprite).y),
+    );
+    if (
+      shiftToTop &&
+      outsideSprite &&
+      (outsideSprite as Phaser.GameObjects.Sprite).y
+    ) {
+      (outsideSprite as Phaser.GameObjects.Sprite).y =
+        minY - this.symbolHeight - this.symbolsYSpacing;
     }
   }
 
@@ -392,28 +444,41 @@ export class Game extends Scene {
             .sort((a, b) => a.y - b.y)
             .slice(0, 3) as Phaser.GameObjects.Sprite[];
 
-          topThree.forEach((sprite: Phaser.GameObjects.Sprite, symbol_index: number) => {
-            (sprite as any).stopPosition = this.stopPositions[symbol_index] + 42;
-            sprite.setTexture('symbols', this.reelResults[index * 3 + symbol_index]);
-          });
+          topThree.forEach(
+            (sprite: Phaser.GameObjects.Sprite, symbol_index: number) => {
+              (sprite as any).stopPosition =
+                this.stopPositions[symbol_index] + 42;
+              sprite.setTexture(
+                'symbols',
+                this.reelResults[index * 3 + symbol_index],
+              );
+            },
+          );
         }
         reel.replacedFrames = true;
 
-        (container.list as Phaser.GameObjects.Sprite[]).forEach((sprite: Phaser.GameObjects.Sprite) => {
-          let yAdvance: number = reel.speed;
+        (container.list as Phaser.GameObjects.Sprite[]).forEach(
+          (sprite: Phaser.GameObjects.Sprite) => {
+            let yAdvance: number = reel.speed;
 
-          if ((sprite as any).stopPosition && sprite.y + reel.speed > (sprite as any).stopPosition) {
-            shallStop = true;
-            yAdvance = (sprite as any).stopPosition - sprite.y;
-          }
-          sprite.y += yAdvance;
-        });
+            if (
+              (sprite as any).stopPosition &&
+              sprite.y + reel.speed > (sprite as any).stopPosition
+            ) {
+              shallStop = true;
+              yAdvance = (sprite as any).stopPosition - sprite.y;
+            }
+            sprite.y += yAdvance;
+          },
+        );
 
         if (shallStop) {
           const container = reel.container;
           reel.speed = 0;
           reel.replacedFrames = false;
-          container.list.filter((child) => child instanceof Phaser.GameObjects.Sprite).map((sprite) => ((sprite as any).stopPosition = null));
+          container.list
+            .filter((child) => child instanceof Phaser.GameObjects.Sprite)
+            .map((sprite) => ((sprite as any).stopPosition = null));
 
           const initialY = container.y;
 
