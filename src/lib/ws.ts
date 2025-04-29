@@ -1,11 +1,6 @@
 // websocket.ts
 
-export type ServerMessage = {
-  won: number;
-  name: string;
-  lines: string; // or a more specific type if you know it
-  reels: string;
-};
+export type ServerMessage = {};
 
 let socket: WebSocket | null = null;
 let listener: ((data: ServerMessage) => void) | null = null;

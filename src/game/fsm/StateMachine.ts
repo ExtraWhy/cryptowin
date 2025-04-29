@@ -1,4 +1,6 @@
-import { createMachine, fromPromise, setup, assign, ActorLogic } from 'xstate';
+import { mapDtoToBetRequest } from '@/lib/api/mapper';
+import { BetRequest } from '@/lib/api/types';
+import { fromPromise, setup, assign, ActorLogic } from 'xstate';
 
 export const SLOT_STATES = {
   idle: 'idle',
@@ -23,7 +25,7 @@ export const slotMachine = (
     types: {
       context: {} as {
         socket_api: {
-          bet: { id: number; money: number };
+          bet_request: BetRequest;
         };
         player: {
           balance: number;
@@ -71,7 +73,7 @@ export const slotMachine = (
     context: {
       count: 0,
       updateFunc: null,
-      socket_api: { bet: { id: 1, money: 100 } },
+      socket_api: { bet_request: mapDtoToBetRequest(0, 100) },
       player: { balance: 0, current_bet: 0, last_win: 0 },
       game: { spinResult: {}, freeSpinsRemaining: 0, autoPlayEnabled: false },
       session: { sessionId: 0 },
@@ -102,20 +104,21 @@ export const slotMachine = (
         type: 'parallel',
         onDone: { target: 'spinning' },
         states: {
-          //sendingBet: {
-          //  initial: 'loading',
-          //  states: {
-          //    loading: {
-          //      invoke: {
-          //        id: 'sendBetAndWait',
-          //        src: 'sendBetAndWait',
-          //        input: ({ context: { socket_api } }) => socket_api.bet,
-          //        onDone: 'success',
-          //      },
-          //    },
-          //    success: { type: 'final' },
-          //  },
-          //},
+          sendingBet: {
+            initial: 'loading',
+            states: {
+              loading: {
+                invoke: {
+                  id: 'sendBetAndWait',
+                  src: 'sendBetAndWait',
+                  input: ({ context: { socket_api } }) =>
+                    socket_api.bet_request,
+                  onDone: 'success',
+                },
+              },
+              success: { type: 'final' },
+            },
+          },
           nudgingReels: {
             initial: 'nudging',
             states: {
