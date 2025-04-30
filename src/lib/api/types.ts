@@ -29,12 +29,14 @@ export interface BetRequest {
   };
 }
 
-// frontend app’s clean domain model (used by both WS & REST)
+// frontend app’s clean domain models (used by both WS & REST)
+
 export interface BetResult {
   id: string;
   betAmount: number;
   winAmount: number;
   lines: number[];
+  symbols: number[][];
 }
 
 // ─────────────────────────────────────────────────────

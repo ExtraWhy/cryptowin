@@ -18,12 +18,50 @@ ws.onMessage((data: ServerMessage) => {
 
 const sendBetAndWait = fromPromise(async ({ input }) => {
   return new Promise<BetResult>((resolve, reject) => {
-    // One request at a time to prevent race conditions
-    if (presolve) {
-      reject();
-    }
+    const serverJson = {
+      id: 'abc123',
+      bet_amount: 5,
+      win_amount: 0,
+      cleo: [
+        { Num: [0], XY: [0] },
+        { Pay: 2, Mult: 2, Num: [0], Line: 2, XY: [0, 1, 1, 0, 0, 0, 0, 0, 0] },
+        { Pay: 2, Mult: 2, Num: [0], Line: 6, XY: [0, 1, 1, 0, 0, 0, 0, 0, 0] },
+        {
+          Pay: 5,
+          Mult: 2,
+          Num: [0],
+          Line: 10,
+          XY: [0, 1, 2, 2, 0, 0, 0, 0, 0],
+        },
+        {
+          Pay: 2,
+          Mult: 2,
+          Num: [0],
+          Line: 16,
+          XY: [0, 1, 1, 0, 0, 0, 0, 0, 0],
+        },
+        {
+          Pay: 2,
+          Mult: 2,
+          Num: [0],
+          Line: 20,
+          XY: [0, 1, 1, 0, 0, 0, 0, 0, 0],
+        },
+      ],
+      Scr: [
+        [1, 7, 3],
+        [2, 10, 11],
+        [11, 10, 6],
+        [11, 6, 7],
+        [12, 13, 6],
+      ],
+    };
     presolve = resolve;
-    ws.send(input);
+    const bet_response: BetResult = mapDtoToBet(
+      serverJson as BetServerResponse,
+    );
+    presolve(bet_response);
+    // One request at a time to prevent race conditions
   });
 });
 

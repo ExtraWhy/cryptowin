@@ -1,3 +1,4 @@
+import { BetResult } from '@/lib/api/types';
 import { BaseSlotScene } from './scenes/BaseSlotScene';
 
 let slotScene: Phaser.Scene;
@@ -43,4 +44,5 @@ export const slotAPI = {
   setUpdateSpin: () => base_scene.setUpdateSpin(),
   setUpdateStop: () => base_scene.setUpdateStop(),
   resetAllReels: () => base_scene.resetAllReels(),
+  handleBetResult: (data:BetResult) => base_scene.handleBetResult(data),
 };

@@ -3,6 +3,7 @@ import { Scene, Display } from 'phaser';
 import Stats from 'stats.js';
 import { EventBus } from '../EventBus';
 import { ReelMachine } from './Reeling';
+import { BetResult } from '@/lib/api/types';
 export class BaseSlotScene extends Scene {
   public reeling!: ReelMachine;
   public onUpdate: (() => void) | null = null;
@@ -34,6 +35,11 @@ export class BaseSlotScene extends Scene {
 
   spinAllReels(): Promise<void[]> {
     return this.reeling.spinAllReels();
+  }
+
+  handleBetResult(data: BetResult) {
+    console.log('phaser bet result receive', data);
+    this.reeling.drawWinningSymbols(data.symbols);
   }
 
   stopAllReels(): Promise<void[]> {

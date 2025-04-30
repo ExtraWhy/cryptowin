@@ -1,9 +1,10 @@
 'use client';
-import { createContext, useContext } from 'react';
-import { useMachine } from '@xstate/react';
+import { createContext, useContext, useEffect } from 'react';
+import { useMachine, useSelector } from '@xstate/react';
 import { slotMachine } from './fsm/StateMachine';
 import sendBetAndWait, { ws } from './fsm/sendBetActor';
 import { slotAPI } from './PhaserService';
+import { ActorRefFrom } from 'xstate';
 
 export const SlotMachineContext = createContext<{
   state: any;
@@ -13,13 +14,23 @@ export const SlotMachineContext = createContext<{
 ws.connect('ws://localhost:8081/ws');
 const machine = slotMachine(slotAPI, { sendBetAndWait: sendBetAndWait });
 
+let _machine_ref: ActorRefFrom<typeof any>;
+
 export const SlotMachineProvider = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
-  const [state, send] = useMachine(machine);
-  console.log('use state', state.value);
+  const [state, send, machine_ref] = useMachine(machine);
+  _machine_ref = machine_ref;
+  const betResult = useBetResult();
+
+  useEffect(() => {
+    console.log('bet result: ', betResult);
+    if (betResult) {
+      slotAPI.handleBetResult(betResult);
+    }
+  }, [betResult]);
 
   return (
     <SlotMachineContext.Provider value={{ state, send }}>
@@ -28,6 +39,25 @@ export const SlotMachineProvider = ({
   );
 };
 
+export const useGameState = (): any => {
+  return useSelector(_machine_ref, (snapshot) => snapshot.context.game);
+};
+export const useBetResult = (): any => {
+  return useSelector(
+    _machine_ref,
+    (snapshot) => snapshot.context.game?.betResult,
+  );
+};
+
+export const useSend = (): any => {
+  return _machine_ref.send;
+};
+
+// ⚠️ WARNING:
+// This hook exposes the full slot machine context and bypasses optimal reactivity.
+// It is kept only for debugging or temporary access during development.
+// Prefer using specialized hooks like `useBetResponse` with `useSelector`
+/*
 export const useSlotMachine = () => {
   const ctx = useContext(SlotMachineContext);
   if (!ctx) {
@@ -37,3 +67,4 @@ export const useSlotMachine = () => {
   }
   return ctx;
 };
+*/

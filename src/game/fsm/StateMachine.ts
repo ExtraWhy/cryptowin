@@ -1,5 +1,5 @@
 import { mapDtoToBetRequest } from '@/lib/api/mapper';
-import { BetRequest } from '@/lib/api/types';
+import { BetRequest, BetResult } from '@/lib/api/types';
 import { fromPromise, setup, assign, ActorLogic } from 'xstate';
 
 export const SLOT_STATES = {
@@ -33,7 +33,7 @@ export const slotMachine = (
           last_win: number;
         };
         game: {
-          spinResult: {};
+          betResult: BetResult | null;
           freeSpinsRemaining: number;
           autoPlayEnabled: boolean;
         };
@@ -75,7 +75,7 @@ export const slotMachine = (
       updateFunc: null,
       socket_api: { bet_request: mapDtoToBetRequest(0, 100) },
       player: { balance: 0, current_bet: 0, last_win: 0 },
-      game: { spinResult: {}, freeSpinsRemaining: 0, autoPlayEnabled: false },
+      game: { betResult: null, freeSpinsRemaining: 0, autoPlayEnabled: false },
       session: { sessionId: 0 },
     },
 
@@ -113,7 +113,15 @@ export const slotMachine = (
                   src: 'sendBetAndWait',
                   input: ({ context: { socket_api } }) =>
                     socket_api.bet_request,
-                  onDone: 'success',
+                  onDone: {
+                    actions: assign({
+                      game: ({ context, event }: any) => ({
+                        ...context.game,
+                        betResult: event.output,
+                      }),
+                    }),
+                    target: 'success',
+                  },
                 },
               },
               success: { type: 'final' },

@@ -38,9 +38,6 @@ export class ReelMachine {
     'bitcoin10.png',
   ];
 
-
-
-
   private scene: Scene;
   private reels: Reel[];
 
@@ -102,6 +99,11 @@ export class ReelMachine {
     });
   }
 
+  public drawWinningSymbols(symbols: number[][]) {
+    let flat_symbols = symbols.flat();
+    this.reelResults = flat_symbols.map((element) => this.coinSymbols[element]);
+  }
+
   public spinAllReels(): Promise<void[]> {
     const maxSpeed = 50; // peak speed per frame
     const acceleration = 0.9; // how fast it reaches max speed
@@ -109,8 +111,6 @@ export class ReelMachine {
     const delayBetweenReels = 20;
 
     this.drawRandomWinningSymbols();
-
-    this.scene.tweens.killAll();
 
     const promises = this.reels.map((reel, index) => {
       reel.speed = 0;

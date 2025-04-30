@@ -1,5 +1,5 @@
 'use client';
-import { useSlotMachine } from '@/game/SlotMachineProvider';
+import { useGameState, useSend } from '@/game/SlotMachineProvider';
 import { Infinity } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
@@ -9,8 +9,10 @@ const GameWrapperNoSSR = dynamic(() => import('@/game/PhaserGame'), {
 });
 
 export default function GameContainer() {
-  const { send, state } = useSlotMachine();
-  const autoplayActive: boolean = state.context.game.autoPlayEnabled;
+  const state = useGameState();
+  const send = useSend();
+  alert(state);
+  const autoplayActive: boolean = state.autoPlayEnabled;
 
   return (
     <div className="lg:w-1/2 w-full aspect-[4/3] relative max-w-[720px] py-4 border-background-500 border-1 rounded-lg my-5">
