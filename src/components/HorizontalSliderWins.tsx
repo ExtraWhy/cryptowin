@@ -63,7 +63,6 @@ export default function PlayerWinsSlider({}) {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    return;
     async function fetchData() {
       try {
         const data = await getPlayers();

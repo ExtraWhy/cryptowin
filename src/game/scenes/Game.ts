@@ -232,7 +232,13 @@ export class Game extends Scene {
           // 1,2,1,2,1
           if (this.winningLines.length) {
             this.winningLines.map((line: number) => {
-              console.log(this.lines[line][reel_index], col_index - (container.list.length - 3));
+              console.log(this.lines);
+              console.log(line);
+              console.log(reel_index);
+              if (!this.lines[line]) {
+                return;
+              }
+              console.log(line, this.lines, 'reel index', reel_index, 'next', this.lines[line][reel_index]);
               if (this.lines[line][reel_index] == col_index - (container.list.length - 3)) {
                 console.log('matching index');
                 //flashing_indexes.push(sprite)
