@@ -8,7 +8,7 @@ export default function SuccessfullLoginPage() {
   useEffect(() => {
     function getCookie(name: string) {
       const cookies = document.cookie.split('; ');
-      console.log('current cookies are:', cookies);
+      //console.log('current cookies are:', cookies);
       for (const cookie of cookies) {
         const [key, val] = cookie.split('=');
         if (key === name) return decodeURIComponent(val.replace(/\+/g, ' '));

@@ -26,7 +26,6 @@ export const SlotMachineProvider = ({
   const betResult = useBetResult();
 
   useEffect(() => {
-    console.log('bet result: ', betResult);
     if (betResult) {
       slotAPI.handleBetResult(betResult);
     }

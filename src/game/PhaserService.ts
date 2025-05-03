@@ -5,16 +5,8 @@ let slotScene: Phaser.Scene;
 let base_scene: BaseSlotScene;
 
 export function registerScene(scene: Phaser.Scene) {
-  console.log('registered scene');
   slotScene = scene;
   base_scene = slotScene as BaseSlotScene;
-  let arr: number[] = [1, 2, 3, 4, 5, 109];
-  //let ar = arr.myMap((el) => el + 1);
-  let ar = arr.myReducer((ac, cur) => ac + cur, 0);
-  //console.log('my map', ar);
-
-  let s = '()opqiwjer{[]}';
-  //console.log(`is ${s} a string with valid brackets`, hasValidBrackets(s));
 }
 
 function hasValidBrackets(s: string): boolean {
@@ -22,7 +14,6 @@ function hasValidBrackets(s: string): boolean {
   let closing_brackets = ['}', ']', ')'];
   let brackets: any[] = [];
   for (let c of s) {
-    //console.log('c', c);
     if (opening_brackets.indexOf(c) !== -1) {
       brackets.push(closing_brackets[opening_brackets.indexOf(c)]);
     } else if (brackets.indexOf(c) !== -1) {
@@ -44,5 +35,11 @@ export const slotAPI = {
   setUpdateSpin: () => base_scene.setUpdateSpin(),
   setUpdateStop: () => base_scene.setUpdateStop(),
   resetAllReels: () => base_scene.resetAllReels(),
-  handleBetResult: (data:BetResult) => base_scene.handleBetResult(data),
+  handleBetResult: (data: BetResult) => base_scene.handleBetResult(data),
+  showLineWins: () =>
+    base_scene.winlines.showWinningLines(base_scene.reeling.animateWinningLine),
+  clearWins: () => {
+    base_scene.winlines.clearWins();
+    base_scene.reeling.clearAnimatingSymbols();
+  },
 };

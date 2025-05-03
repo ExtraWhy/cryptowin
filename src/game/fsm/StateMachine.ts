@@ -9,6 +9,7 @@ export const SLOT_STATES = {
   spinning_autoplay: 'spinning_autoplay',
   stopping: 'stopping',
   stopped: 'stopped',
+  show_line_wins: 'show_line_wins',
 };
 
 export const slotMachine = (
@@ -18,6 +19,8 @@ export const slotMachine = (
     setUpdateSpin: () => void;
     setUpdateStop: () => void;
     resetAllReels: () => void;
+    showLineWins: () => void;
+    clearWins: () => void;
   },
   external_actors: Record<string, ActorLogic<any, any>>,
 ) =>
@@ -66,6 +69,11 @@ export const slotMachine = (
           return { ...context.game, autoPlayEnabled: false };
         },
       }),
+    },
+    guards: {
+      hasLineWins: ({ context }: any) =>
+        Array.isArray(context.game?.betResult?.lines) &&
+        context.game.betResult.lines.length > 0,
     },
   }).createMachine({
     id: 'slotmachine',
@@ -159,6 +167,12 @@ export const slotMachine = (
         on: {
           TOGGLE: { target: SLOT_STATES.stopping, actions: 'stopAutoPlay' },
         },
+        after: {
+          1500: {
+            target: SLOT_STATES.stopping,
+            guard: ({ context }: any) => !context.game.autoPlayEnabled,
+          },
+        },
         always: [
           {
             guard: ({ context }: any) => context.game.autoPlayEnabled,
@@ -187,7 +201,16 @@ export const slotMachine = (
 
       stopped: {
         entry: () => external_actions.resetAllReels(),
-        always: { target: SLOT_STATES.idle },
+        always: [
+          { guard: 'hasLineWins', target: SLOT_STATES.show_line_wins },
+          { target: SLOT_STATES.idle },
+        ],
+      },
+
+      show_line_wins: {
+        entry: () => external_actions.showLineWins(),
+        exit: () => external_actions.clearWins(),
+        on: { TOGGLE: SLOT_STATES.starting },
       },
     },
   });

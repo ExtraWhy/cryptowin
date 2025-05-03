@@ -11,7 +11,7 @@ export interface Reel {
   stopResolve?: () => void;
 }
 
-export class ReelMachine {
+export class ReelsManager {
   // ===  defaults you had as top-level constants ===
   public readonly reelCount = 5;
   public readonly symbolsPerReel = 7;
@@ -21,8 +21,9 @@ export class ReelMachine {
   public readonly startY = -60;
 
   public readonly coinSymbols: string[] = [
-    'bitcoin.png',
+    '9.png',
     'dogecoin.png',
+    'bitcoin.png',
     'pepe-pepe-logo.png',
     'usd-coin-usdc-logo.png',
     'tether-usdt-logo.png',
@@ -30,7 +31,6 @@ export class ReelMachine {
     'symbol2.png',
     'xrp-xrp-logo.png',
     '7.png',
-    '9.png',
     '10.png',
     't.png',
     'j.png',
@@ -133,7 +133,6 @@ export class ReelMachine {
   }
 
   stopAllReels(): Promise<void[]> {
-    console.log('hey');
     this.scene.time.removeAllEvents();
 
     const finishPromises = this.reels.map(
@@ -169,15 +168,68 @@ export class ReelMachine {
 
           sprite.y = symbolY;
           (sprite as any).stopPosition = null;
-          let randomTexture = Phaser.Utils.Array.GetRandom(this.coinSymbols);
+          let symbolTexture = Phaser.Utils.Array.GetRandom(this.coinSymbols);
           if (col_index >= container.list.length - 3) {
-            randomTexture =
+            symbolTexture =
               this.reelResults[
                 reel_index * 3 + col_index - (container.list.length - 3)
               ];
             //randomTexture = 'dogecoin.png';
           }
-          sprite.setTexture('symbols', randomTexture);
+
+          sprite.setTexture('symbols', symbolTexture);
+        },
+      );
+    });
+    //this.animateWinningLine([0, 1, 0, 1, 0, 1]);
+  }
+
+  public animateWinningLine = (line: number[]) => {
+    this.reels.forEach((reel, reelIndex) => {
+      const { container } = reel;
+
+      // Clear any existing tweens on all sprites
+      (container.list as Phaser.GameObjects.Sprite[]).forEach(
+        (sprite: Phaser.GameObjects.Sprite) => {
+          this.scene.tweens.killTweensOf(sprite); // Stop any active tweens
+          sprite.setScale(1); // Reset scale
+          sprite.setAngle(0); // Reset angle
+        },
+      );
+
+      // Determine the symbol index from the `line` input (e.g. 0,1,2)
+      const symbolIndex = line[reelIndex];
+      if (symbolIndex == null) return;
+
+      // The list is longer than 3; the last 3 symbols are the visible ones
+      const visibleSymbolsStartIndex = container.list.length - 3;
+      const sprite = container.list[
+        visibleSymbolsStartIndex + symbolIndex
+      ] as Phaser.GameObjects.Sprite;
+
+      if (sprite) {
+        this.scene.tweens.add({
+          targets: sprite,
+          scale: { from: 1, to: 1.2 },
+          duration: 500,
+          ease: 'Sine.easeInOut',
+          yoyo: true,
+          repeat: -1,
+        });
+      }
+    });
+  };
+
+  clearAnimatingSymbols() {
+    this.reels.forEach((reel, reelIndex) => {
+      const { container } = reel;
+
+      // Clear any existing tweens on all sprites
+      (container.list as Phaser.GameObjects.Sprite[]).forEach(
+        (sprite: Phaser.GameObjects.Sprite) => {
+          this.scene.tweens.killTweensOf(sprite); // Stop any active tweens
+          sprite.setScale(1); // Reset scale
+          sprite.setAngle(0); // Reset angle
         },
       );
     });
@@ -232,7 +284,7 @@ export class ReelMachine {
     this.tweenPromise({
       targets: container,
       y: container.y - 21,
-      duration: 30,
+      duration: 50,
       ease: 'Sine.easeOut',
     }).then(() => {
       reel.stopResolve?.();

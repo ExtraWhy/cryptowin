@@ -11,7 +11,6 @@ const GameWrapperNoSSR = dynamic(() => import('@/game/PhaserGame'), {
 export default function GameContainer() {
   const state = useGameState();
   const send = useSend();
-  alert(state);
   const autoplayActive: boolean = state.autoPlayEnabled;
 
   return (

@@ -9,17 +9,18 @@ import {
 } from './types';
 
 export function mapDtoToBet(dto: BetServerResponse): BetResult {
-  const lines = dto.cleo.filter(
-    (entry): entry is Required<Pick<CleoEntry, 'Line'>> & CleoEntry =>
-      typeof entry.Line === 'number',
-  );
-  //.map((entry) => entry.Line);
+  const lines = dto.cleo
+    .filter(
+      (entry): entry is Required<Pick<CleoEntry, 'Line'>> & CleoEntry =>
+        typeof entry.Line === 'number',
+    )
+    .map((entry: any) => entry.Line - 1);
 
   return {
     id: 'id_hardcoded',
     betAmount: 123456,
     winAmount: 123456,
-    wins: lines,
+    lines: lines,
     symbols: dto.Scr,
   };
 }

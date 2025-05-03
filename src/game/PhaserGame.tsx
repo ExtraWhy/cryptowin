@@ -3,7 +3,6 @@ import { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
 import StartGame from './main';
 import { EventBus } from './EventBus';
 import { registerScene } from './PhaserService';
-import { BaseSlotScene } from './scenes/BaseSlotScene';
 
 export default function GameWrapper() {
   return <PhaserGame />;
@@ -25,7 +24,6 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(
     useLayoutEffect(() => {
       if (game.current === null) {
         game.current = StartGame('game-container');
-        console.log(game.current.scene);
         if (typeof ref === 'function') {
           ref({ game: game.current, scene: null });
         } else if (ref) {
@@ -45,7 +43,6 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(
 
     useEffect(() => {
       EventBus.on('current-scene-ready', (scene_instance: Phaser.Scene) => {
-        console.log('hey there', currentActiveScene, scene_instance);
         registerScene(scene_instance);
         if (currentActiveScene && typeof currentActiveScene === 'function') {
           currentActiveScene(scene_instance);

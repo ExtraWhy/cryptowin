@@ -44,7 +44,7 @@ const sendBetAndWait = fromPromise(async ({ input }) => {
           Pay: 2,
           Mult: 2,
           Num: [0],
-          Line: 20,
+          Line: 5,
           XY: [0, 1, 1, 0, 0, 0, 0, 0, 0],
         },
       ],
@@ -57,10 +57,11 @@ const sendBetAndWait = fromPromise(async ({ input }) => {
       ],
     };
     presolve = resolve;
-    const bet_response: BetResult = mapDtoToBet(
-      serverJson as BetServerResponse,
-    );
-    presolve(bet_response);
+    ws.send(input);
+    //const bet_response: BetResult = mapDtoToBet(
+    //  serverJson as BetServerResponse,
+    //);
+    //presolve(bet_response);
     // One request at a time to prevent race conditions
   });
 });
@@ -74,13 +75,4 @@ function dependenciesChanged(arr1: any[], arr2: any[]): boolean {
     if (arr1[i] !== arr2[i]) return true;
   }
   return false;
-}
-
-function useMemo<T>(calcValue: () => T, deps: any[]): T {
-  const memo_info = useRef<{ deps: any[]; value: T } | null>(null);
-  if (!memo_info.current || dependenciesChanged(memo_info.current.deps, deps)) {
-    memo_info.current = { deps: deps, value: calcValue() };
-  }
-
-  return memo_info.current.value;
 }

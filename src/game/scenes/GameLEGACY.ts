@@ -265,15 +265,47 @@ export class Game extends Scene {
                   console.log('matching index');
                   //flashing_indexes.push(sprite)
 
-                  this.tweenPromise({
-                    targets: sprite,
-                    scale: { from: 1, to: 1.2 },
-                    angle: { from: -20, to: 20 },
-                    duration: 800,
-                    ease: 'Sine.easeInOut',
-                    yoyo: true,
-                    repeat: -1,
-                  });
+}
+
+  resetAllReels() {
+    this.reels.forEach((reel, reel_index) => {
+      const { container } = reel;
+      reel.replacedFrames = false;
+      reel.stopping = false;
+      let posY: number =
+        -3 * (this.symbolHeight + this.symbolsYSpacing) + this.startY;
+      container.y = posY;
+
+      (container.list as Phaser.GameObjects.Sprite[]).forEach(
+        (sprite: Phaser.GameObjects.Sprite, col_index: number) => {
+          const symbolY =
+            col_index * (this.symbolHeight + this.symbolsYSpacing);
+
+          sprite.y = symbolY;
+          (sprite as any).stopPosition = null;
+          let randomTexture = Phaser.Utils.Array.GetRandom(this.coinSymbols);
+          if (col_index >= container.list.length - 3) {
+            randomTexture =
+              this.reelResults[
+                reel_index * 3 + col_index - (container.list.length - 3)
+              ];
+            //randomTexture = 'dogecoin.png';
+          } else {
+            this.scene.tweens.add({
+              targets: sprite,
+              scale: 1.2,
+              yoyo: true,
+              ease: 'Power2',
+              duration: 1000,
+              repeat: -1,
+            });
+          }
+          sprite.setTexture('symbols', randomTexture);
+        },
+      );
+    });
+  }
+
                 }
               });
             }
