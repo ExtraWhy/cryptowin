@@ -43,6 +43,7 @@ export default function WebSocketManager() {
 
     send(data: unknown): void {
       if (socket?.readyState === WebSocket.OPEN) {
+        console.log('sending ws', data);
         socket.send(JSON.stringify(data));
       } else {
         console.warn('[WS] Cannot send, socket not open:', data);
