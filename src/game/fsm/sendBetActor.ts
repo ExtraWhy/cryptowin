@@ -29,12 +29,3 @@ const sendBetAndWait = fromPromise(async ({ input }) => {
 });
 
 export default sendBetAndWait;
-
-function dependenciesChanged(arr1: any[], arr2: any[]): boolean {
-  if (!arr1 || !arr2) return true;
-  if (arr1.length !== arr2.length) return true;
-  for (let i = 0; i < arr1.length; i++) {
-    if (arr1[i] !== arr2[i]) return true;
-  }
-  return false;
-}

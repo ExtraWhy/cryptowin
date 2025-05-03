@@ -20,6 +20,7 @@ export default function WebSocketManager() {
       });
 
       socket.addEventListener('message', (event: MessageEvent) => {
+        console.log('[WS] Connected to', url);
         try {
           const data = JSON.parse(event.data) as ServerMessage;
           console.log('[WS] Raw message received:', data);

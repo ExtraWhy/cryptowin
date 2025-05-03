@@ -26,7 +26,7 @@ export function mapDtoToBet(dto: BetServerResponse): BetResult {
 }
 
 export function mapDtoToBetRequest(id: number, money: number): BetRequest {
-  return { bet: { id: id, money: money } };
+  return { id: id, money: money };
 }
 
 export function mapDtoToPlayerWin(data: PlayerData): PlayerWin {

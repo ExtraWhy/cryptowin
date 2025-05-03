@@ -11,7 +11,7 @@ export const SlotMachineContext = createContext<{
   send: (event: any) => void;
 } | null>(null);
 
-ws.connect('ws://localhost:8081/ws');
+ws.connect('ws://127.0.0.1:8081/ws');
 const machine = slotMachine(slotAPI, { sendBetAndWait: sendBetAndWait });
 
 let _machine_ref: ActorRefFrom<typeof any>;

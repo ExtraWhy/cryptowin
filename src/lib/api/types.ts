@@ -23,10 +23,8 @@ export interface BetServerResponse extends ServerMessage {
 
 // WS “place a bet” request
 export interface BetRequest {
-  bet: {
-    id: number;
-    money: number;
-  };
+  id: number;
+  money: number;
 }
 
 // frontend app’s clean domain models (used by both WS & REST)
