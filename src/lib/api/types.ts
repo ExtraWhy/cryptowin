@@ -33,7 +33,7 @@ export interface BetResult {
   id: string;
   betAmount: number;
   winAmount: number;
-  lines: number[];
+  lines: {}[];
   symbols: number[][];
 }
 

@@ -37,7 +37,7 @@ export class WinLineDisplay {
     [0, 0, 0, 1, 2], // 20
   ];
 
-  winning_lines: number[] = [];
+  winning_lines: { line: number; winning_symbol_count: number }[] = [];
 
   constructor(scene: Scene, symbols_count: number = 15) {
     this.scene = scene;
@@ -57,7 +57,7 @@ export class WinLineDisplay {
     this.scene.add.existing(overlay);
   }
 
-  setWinningLines(lines: number[]) {
+  setWinningLines(lines: typeof this.winning_lines) {
     this.winning_lines = [...lines];
     console.log('WINNING LINESSSSSSSSSSSSS', this.winning_lines);
   }
@@ -96,24 +96,38 @@ export class WinLineDisplay {
     }
   }
 
-  showWinningLines(animateWinningLine: (line: number[]) => void) {
-    let winning_lines_length = this.winning_lines.length;
-    let count = 0;
-    let positions: number[] =
-      this.lines[this.winning_lines[count % winning_lines_length]];
-    this.playWin(positions);
-    animateWinningLine(positions);
+  showWinningLines(
+    animateWinningLineSymbols: (
+      line: number[],
+      winning_symbols_count: number,
+    ) => void,
+  ) {
+    let count: number = 0;
+    let win_info = this.getWinLineInfo(count);
+    this.playWin(win_info.positions, win_info.symbols_count);
+    animateWinningLineSymbols(win_info.positions, win_info.symbols_count);
     this.interval_id = setInterval(() => {
       count++;
-      positions = this.lines[this.winning_lines[count % winning_lines_length]];
-      this.playWin(positions);
-      animateWinningLine(positions);
+      win_info = this.getWinLineInfo(count);
+      this.playWin(win_info.positions, win_info.symbols_count);
+      animateWinningLineSymbols(win_info.positions, win_info.symbols_count);
     }, 1000);
   }
 
-  playWin(positions: number[]) {
+  getWinLineInfo(index: number): {
+    positions: number[];
+    symbols_count: number;
+  } {
+    let win_line_info = this.winning_lines[index % this.winning_lines.length];
+    return {
+      positions: this.lines[win_line_info.line],
+      symbols_count: win_line_info.winning_symbol_count,
+    };
+  }
+
+  playWin(positions: number[], winning_symbols_count: number) {
     this.drawLineAnimated(positions);
-    this.showBoxesForLine(positions);
+    this.showBoxesForLine(positions, winning_symbols_count);
   }
 
   clearWins() {
@@ -122,10 +136,10 @@ export class WinLineDisplay {
     if (this.interval_id) clearInterval(this.interval_id);
   }
 
-  showBoxesForLine(positions: number[]) {
+  showBoxesForLine(positions: number[], winning_symbols_count: number) {
     this.hideBoxes();
 
-    positions.forEach((p, i) => {
+    positions.slice(0, winning_symbols_count).forEach((p, i) => {
       const index = (p % 3) + i * 3;
       const box = this.boxes[index];
       box.setVisible(true);

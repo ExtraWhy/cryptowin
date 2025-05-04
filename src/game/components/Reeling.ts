@@ -184,8 +184,12 @@ export class ReelsManager {
     //this.animateWinningLine([0, 1, 0, 1, 0, 1]);
   }
 
-  public animateWinningLine = (line: number[]) => {
-    this.reels.forEach((reel, reelIndex) => {
+  public animateWinningLine = (
+    line: number[],
+    winning_symbols_count: number,
+  ) => {
+    console.log('wincount', winning_symbols_count);
+    this.reels.slice(0, winning_symbols_count).forEach((reel, reelIndex) => {
       const { container } = reel;
 
       // Clear any existing tweens on all sprites
