@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect } from 'react';
 import { useMachine, useSelector } from '@xstate/react';
 import { slotMachine } from './fsm/StateMachine';
-import sendBetAndWait, { ws } from './fsm/sendBetActor';
+import sendBetAndWait from './fsm/sendBetActor';
 import { slotAPI } from './PhaserService';
 import { ActorRefFrom } from 'xstate';
 
@@ -11,10 +11,9 @@ export const SlotMachineContext = createContext<{
   send: (event: any) => void;
 } | null>(null);
 
-ws.connect('ws://127.0.0.1:8081/ws');
 const machine = slotMachine(slotAPI, { sendBetAndWait: sendBetAndWait });
 
-let _machine_ref: ActorRefFrom<typeof any>;
+let _machine_ref: ActorRefFrom<typeof machine>;
 
 export const SlotMachineProvider = ({
   children,
@@ -55,7 +54,7 @@ export const useSend = (): any => {
 // ⚠️ WARNING:
 // This hook exposes the full slot machine context and bypasses optimal reactivity.
 // It is kept only for debugging or temporary access during development.
-// Prefer using specialized hooks like `useBetResponse` with `useSelector`
+// Prefer using specialized hooks like `useBetResult` with `useSelector`
 /*
 export const useSlotMachine = () => {
   const ctx = useContext(SlotMachineContext);

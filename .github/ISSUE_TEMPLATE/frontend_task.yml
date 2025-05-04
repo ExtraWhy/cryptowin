@@ -1,0 +1,68 @@
+
+name: Frontend Task
+description: Use this form to create a new frontend development task
+title: "[FE] "
+labels: [frontend]
+assignees:
+  - carnophager
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🛠️ Frontend Task
+
+  - type: input
+    id: summary
+    attributes:
+      label: Task Summary
+      description: A one-line summary of what the task is about
+      placeholder: e.g., Add responsive navbar component
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Detailed Description
+      description: Describe what needs to be done in detail
+      placeholder: Include any relevant behavior, state management notes, or routing logic
+    validations:
+      required: true
+
+  - type: textarea
+    id: screens
+    attributes:
+      label: Screens / Components Affected
+      description: Which parts of the UI does this task touch?
+      placeholder: e.g., HomePage.tsx, NavBar.tsx
+
+  - type: input
+    id: design
+    attributes:
+      label: Design Reference
+      description: Link to Figma, Zeplin, or screenshot if available
+      placeholder: e.g., https://www.figma.com/file/...
+  
+  - type: checkboxes
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Define what must be true for this task to be considered complete
+      options:
+        - label: UI matches the design spec
+        - label: Works on all breakpoints (mobile/tablet/desktop)
+        - label: Code is modular and reusable
+        - label: No visual regressions in related components
+
+  - type: textarea
+    id: tech_notes
+    attributes:
+      label: Technical Notes
+      description: Mention libraries to use, patterns to follow, or constraints
+      placeholder: Use Tailwind classes for spacing; follow existing animation patterns in /components/Animated
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Anything else you want to note?

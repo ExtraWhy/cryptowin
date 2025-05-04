@@ -9,26 +9,9 @@ export function registerScene(scene: Phaser.Scene) {
   base_scene = slotScene as BaseSlotScene;
 }
 
-function hasValidBrackets(s: string): boolean {
-  let opening_brackets = ['{', '[', '('];
-  let closing_brackets = ['}', ']', ')'];
-  let brackets: any[] = [];
-  for (let c of s) {
-    if (opening_brackets.indexOf(c) !== -1) {
-      brackets.push(closing_brackets[opening_brackets.indexOf(c)]);
-    } else if (brackets.indexOf(c) !== -1) {
-      let closed_bracket = brackets.pop();
-      //If closing bracket not matching opened string has invalid brackets and we exit
-      if (closed_bracket != c) return false;
-    }
-  }
-
-  // If everything is ok and all brackets are removed from the stack and during for check then string has valid brackets or no brackets at all
-  return brackets.length === 0;
-}
-
 export const slotAPI = {
   startSpin: () => {
+    // Returns a Promise which the state machine transitions to spinning state, after start is complete by getting server bet response and initial nudge animation
     return base_scene.spinAllReels();
   },
   stopSpin: () => base_scene.stopAllReels(),

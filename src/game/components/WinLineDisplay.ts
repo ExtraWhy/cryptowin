@@ -2,9 +2,9 @@ import { BlendModes, Scene } from 'phaser';
 
 export class WinLineDisplay {
   scene: Scene;
-  boxes: Phaser.GameObjects.Graphics[] = [];
+  boxes: Phaser.GameObjects.Container[] = [];
   private instance_line: Phaser.GameObjects.Graphics | null = null;
-  private interval_id: NodeJS.Timeout;
+  private interval_id: NodeJS.Timeout | null = null;
   private updateProgress: number = 0;
   private updateDuration: number = 700;
   private updatePoints: Phaser.Math.Vector2[] = [];
@@ -97,9 +97,6 @@ export class WinLineDisplay {
   }
 
   showWinningLines(animateWinningLine: (line: number[]) => void) {
-    //let ar: any[] = [{ line: 0 }, { line: 5 }, { line: 9 }, { line: 4 }];
-
-    //this.drawLine(5);
     let winning_lines_length = this.winning_lines.length;
     let count = 0;
     let positions: number[] =
@@ -122,7 +119,7 @@ export class WinLineDisplay {
   clearWins() {
     this.clearLines();
     this.hideBoxes();
-    clearInterval(this.interval_id);
+    if (this.interval_id) clearInterval(this.interval_id);
   }
 
   showBoxesForLine(positions: number[]) {

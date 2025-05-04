@@ -1,5 +1,5 @@
 // websocket.ts
-
+import { WS_URL } from '@/lib/api/api';
 export type ServerMessage = {};
 
 let socket: WebSocket | null = null;
@@ -7,7 +7,7 @@ let listener: ((data: ServerMessage) => void) | null = null;
 
 export default function WebSocketManager() {
   return {
-    connect(url: string): void {
+    connect(url: string = WS_URL): void {
       if (socket && socket.readyState <= 1) {
         console.warn('[WS] Already connected or connecting');
         return;

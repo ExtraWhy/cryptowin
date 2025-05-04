@@ -8,7 +8,7 @@ import {
   CleoEntry,
 } from './types';
 
-export function mapDtoToBet(dto: BetServerResponse): BetResult {
+export function mapDtoToBetResult(dto: BetServerResponse): BetResult {
   const lines = dto.cleo
     .filter(
       (entry): entry is Required<Pick<CleoEntry, 'Line'>> & CleoEntry =>

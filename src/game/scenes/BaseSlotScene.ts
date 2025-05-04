@@ -18,7 +18,6 @@ export class BaseSlotScene extends Scene {
   }
 
   create() {
-    //this.ws.connect('ws://localhost:8081/ws');
     // stats
     this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb
     this.stats.dom.style.position = 'absolute';
@@ -65,6 +64,4 @@ export class BaseSlotScene extends Scene {
     this.onUpdate?.();
     this.stats.end();
   }
-
-  //Array.prototype.map = (()) : number[] => {
 }
