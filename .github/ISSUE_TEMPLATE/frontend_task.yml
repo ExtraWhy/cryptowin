@@ -63,3 +63,20 @@ body:
     attributes:
       label: ✅ Acceptance Criteria
       options:
+        - label: Matches design
+        - label: Works on all breakpoints
+        - label: Reusable code
+        - label: Tested in major browsers
+
+  - type: textarea
+    id: tech_notes
+    attributes:
+      label: Technical Notes
+      description: Add implementation tips, dependencies, or constraints
+      placeholder: Use Tailwind; reuse ToggleMenu component from utils
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Anything else?
