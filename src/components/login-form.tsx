@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LOGIN_ROUTES } from '@/lib/api/api';
+import Image from 'next/image';
 
 export function LoginForm({
   className,
@@ -97,7 +98,7 @@ export function LoginForm({
             </div>
           </form>
           <div className="bg-muted relative hidden md:block">
-            <img
+            <Image
               src="/images/login.webp"
               alt="Image"
               className="absolute inset-0 h-full w-full object-cover brightness-[0.6] grayscale"

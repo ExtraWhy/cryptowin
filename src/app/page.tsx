@@ -3,7 +3,7 @@ import Header from '@/components/Header';
 import Video from '@/components/Video';
 import PlayerWinsSlider from '@/components/HorizontalSliderWins';
 import Games from '@/components/Games';
-import Game from '@/components/Game';
+import Game from '@/game/react/Game';
 
 export default function HomePage() {
   return (

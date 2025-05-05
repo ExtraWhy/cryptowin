@@ -19,7 +19,7 @@ ws.onMessage((data: ServerMessage) => {
 });
 
 const sendBetAndWait = fromPromise(async ({ input }) => {
-  return new Promise<BetResult>((resolve, reject) => {
+  return new Promise<BetResult>((resolve) => {
     presolve = resolve;
     ws.send(input);
   });

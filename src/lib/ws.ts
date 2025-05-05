@@ -1,5 +1,6 @@
 // websocket.ts
 import { WS_URL } from '@/lib/api/api';
+import log from '@/lib/logger';
 export type ServerMessage = {};
 
 let socket: WebSocket | null = null;
@@ -16,14 +17,13 @@ export default function WebSocketManager() {
       socket = new WebSocket(url);
 
       socket.addEventListener('open', () => {
-        console.log('[WS] Connected to', url);
+        log.good('[WS] Connected to', url);
       });
 
       socket.addEventListener('message', (event: MessageEvent) => {
-        console.log('[WS] Connected to', url);
         try {
           const data = JSON.parse(event.data) as ServerMessage;
-          console.log('[WS] Raw message received:', data);
+          log.good('[WS] Raw message received:', data);
 
           if (listener) {
             listener(data);
@@ -34,20 +34,20 @@ export default function WebSocketManager() {
       });
 
       socket.addEventListener('close', () => {
-        console.log('[WS] Connection closed');
+        log.warn('[WS] Connection closed');
       });
 
       socket.addEventListener('error', (err) => {
-        console.error('[WS] Error:', err);
+        log.error('[WS] Error:', err);
       });
     },
 
     send(data: unknown): void {
       if (socket?.readyState === WebSocket.OPEN) {
-        console.log('sending ws', data);
+        log.info('sending ws', data);
         socket.send(JSON.stringify(data));
       } else {
-        console.warn('[WS] Cannot send, socket not open:', data);
+        log.error('[WS] Cannot send, socket not open:', data);
       }
     },
 

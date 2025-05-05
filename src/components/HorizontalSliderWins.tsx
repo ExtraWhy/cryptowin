@@ -5,6 +5,7 @@ import 'keen-slider/keen-slider.min.css';
 import { CircleDollarSign } from 'lucide-react';
 import { getPlayers } from '@/lib/api/players';
 import { PlayerWin } from '@/lib/api/types';
+import log from '@/lib/logger';
 
 const SLIDES_COUNT = 11;
 const animation = { duration: 15000, easing: (t: number) => t };
@@ -29,7 +30,7 @@ const mockWins = [
 
 const MutationPlugin: KeenSliderPlugin = (slider) => {
   const observer = new MutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
+    mutations.forEach(function () {
       slider.update();
     });
   });
@@ -45,7 +46,7 @@ const MutationPlugin: KeenSliderPlugin = (slider) => {
 
 export default function PlayerWinsSlider({}) {
   const wins = useRef<PlayerWin[]>([]);
-  const players_filled = useRef<Boolean>(false);
+  const players_filled = useRef<boolean>(false);
   const batch_id = useRef<number>(0);
   const [slideDetails, setSlidesDetails] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -55,11 +56,11 @@ export default function PlayerWinsSlider({}) {
     async function fetchData() {
       try {
         const mappedPlayers = await getPlayers();
-        console.log('mapper', mappedPlayers);
+        log.info('mapper', mappedPlayers);
         //const mappedPlayers = [{ id: 8, money: '25', name: 'Bonbonev' }];
         const date = new Date();
         batch_id.current += 1;
-        console.log(
+        log.info(
           'batch id: ',
           batch_id.current,
           'min:sec',
@@ -95,7 +96,7 @@ export default function PlayerWinsSlider({}) {
 
         wins.current = [...wins.current, ...mappedPlayers];
       } catch (err) {
-        console.log('Failed to load, err: ', err);
+        log.error('Failed to load, err: ', err);
         if (!players_filled.current) {
           wins.current = mockWins;
         }
@@ -107,12 +108,12 @@ export default function PlayerWinsSlider({}) {
 
     fetchData();
 
-    //wins.current = mockWins;
+    ////wins.current = mockWins;
 
     setInterval(fetchData, 5000);
   }, []);
 
-  const [sliderRef, slider] = useKeenSlider<HTMLDivElement>(
+  const [sliderRef] = useKeenSlider<HTMLDivElement>(
     {
       loop: true,
       renderMode: 'performance',
@@ -161,11 +162,11 @@ export default function PlayerWinsSlider({}) {
             ? Math.abs(slideDetails[idx]?.abs)
             : 1;
           abs_index %= wins.current.length;
-          let name: string =
+          const name: string =
             wins.current[abs_index].playerName +
             ' ' +
             (slideDetails ? slideDetails[idx].abs : '');
-          let amount: string = Number(
+          const amount: string = Number(
             wins.current[abs_index].winAmount,
           ).toLocaleString();
           return (

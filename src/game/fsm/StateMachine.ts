@@ -1,6 +1,6 @@
 import { mapDtoToBetRequest } from '@/lib/api/mapper';
 import { BetRequest, BetResult } from '@/lib/api/types';
-import { fromPromise, setup, assign, ActorLogic } from 'xstate';
+import { fromPromise, setup, assign } from 'xstate';
 
 export const SLOT_STATES = {
   idle: 'idle',
@@ -22,7 +22,7 @@ export const slotMachine = (
     showLineWins: () => void;
     clearWins: () => void;
   },
-  external_actors: Record<string, ActorLogic<any, any>>,
+  external_actors: Record<string, ReturnType<typeof fromPromise>>,
 ) =>
   setup({
     types: {

@@ -1,5 +1,5 @@
 import { BetResult } from '@/lib/api/types';
-import { BaseSlotScene } from './scenes/BaseSlotScene';
+import { BaseSlotScene } from '@/game/scenes/BaseSlotScene';
 
 let slotScene: Phaser.Scene;
 let base_scene: BaseSlotScene;

@@ -1,6 +1,6 @@
 'use client';
-import { SlotMachineProvider } from '@/game/SlotMachineProvider';
-import GameContainer from './GameContainer';
+import { SlotMachineProvider } from '@/game/react/SlotMachineProvider';
+import GameContainer from '@/game/react/GameContainer';
 
 export default function Game() {
   return (

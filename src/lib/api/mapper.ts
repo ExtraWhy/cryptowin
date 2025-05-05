@@ -33,6 +33,5 @@ export function mapDtoToBetRequest(id: number, money: number): BetRequest {
 }
 
 export function mapDtoToPlayerWin(data: PlayerData): PlayerWin {
-  // console.log(`data.id ${data.id} is also provided in response`)
   return { winAmount: data.money, playerName: data.name };
 }

@@ -1,4 +1,4 @@
-import { Scene, GameObjects, Tweens } from 'phaser';
+import { Scene } from 'phaser';
 
 export interface Reel {
   container: Phaser.GameObjects.Container;
@@ -9,6 +9,14 @@ export interface Reel {
   replacedFrames: boolean;
   stopping: boolean;
   stopResolve?: () => void;
+}
+
+declare module 'phaser' {
+  namespace GameObjects {
+    interface Sprite {
+      stopPosition?: number | null;
+    }
+  }
 }
 
 export class ReelsManager {
@@ -53,7 +61,7 @@ export class ReelsManager {
 
     for (let i = 0; i < this.reelCount; i++) {
       //graphics.fillRoundedRect(12 + i * this.reelSpacing, 0, 132, 413, 10);
-      let posY: number =
+      const posY: number =
         -3 * (this.symbolHeight + this.symbolsYSpacing) + this.startY;
 
       const container = this.scene.add.container(
@@ -100,7 +108,7 @@ export class ReelsManager {
   }
 
   public drawWinningSymbols(symbols: number[][]) {
-    let flat_symbols = symbols.flat();
+    const flat_symbols = symbols.flat();
     this.reelResults = flat_symbols.map((element) => this.coinSymbols[element]);
   }
 
@@ -157,7 +165,7 @@ export class ReelsManager {
       const { container } = reel;
       reel.replacedFrames = false;
       reel.stopping = false;
-      let posY: number =
+      const posY: number =
         -3 * (this.symbolHeight + this.symbolsYSpacing) + this.startY;
       container.y = posY;
 
@@ -167,7 +175,7 @@ export class ReelsManager {
             col_index * (this.symbolHeight + this.symbolsYSpacing);
 
           sprite.y = symbolY;
-          (sprite as any).stopPosition = null;
+          sprite.stopPosition = null;
           let symbolTexture = Phaser.Utils.Array.GetRandom(this.coinSymbols);
           if (col_index >= container.list.length - 3) {
             symbolTexture =
@@ -188,7 +196,6 @@ export class ReelsManager {
     line: number[],
     winning_symbols_count: number,
   ) => {
-    console.log('wincount', winning_symbols_count);
     this.reels.slice(0, winning_symbols_count).forEach((reel, reelIndex) => {
       const { container } = reel;
 
@@ -225,7 +232,7 @@ export class ReelsManager {
   };
 
   clearAnimatingSymbols() {
-    this.reels.forEach((reel, reelIndex) => {
+    this.reels.forEach((reel) => {
       const { container } = reel;
 
       // Clear any existing tweens on all sprites
@@ -280,7 +287,7 @@ export class ReelsManager {
     // clear stop markers
     container.list.forEach((c) => {
       if (c instanceof Phaser.GameObjects.Sprite) {
-        (c as any).stopPosition = null;
+        c.stopPosition = null;
       }
     });
 
@@ -308,7 +315,7 @@ export class ReelsManager {
       const resultFrame = this.reelResults[reelIndex * 3 + symIdx];
       // compute stopPosition if you have specific Y; otherwise you can
       // use sprite.y + some offset
-      (sprite as any).stopPosition = this.stopPositions[symIdx] + 42;
+      sprite.stopPosition = this.stopPositions[symIdx] + 42;
       sprite.setTexture('symbols', resultFrame);
     });
   }
@@ -317,11 +324,13 @@ export class ReelsManager {
     let shouldFinish = false;
 
     (reel.container.list as Phaser.GameObjects.Sprite[]).forEach((sprite) => {
-      const sp = sprite as any;
       let dy = reel.speed;
 
-      if (sp.stopPosition != null && sprite.y + reel.speed > sp.stopPosition) {
-        dy = sp.stopPosition - sprite.y;
+      if (
+        sprite.stopPosition != null &&
+        sprite.y + reel.speed > sprite.stopPosition
+      ) {
+        dy = sprite.stopPosition - sprite.y;
         shouldFinish = true;
       }
       sprite.y += dy;
@@ -351,11 +360,13 @@ export class ReelsManager {
       }
     });
 
-    if (shiftToTop && outsideSprite) {
+    if (shiftToTop && outsideSprite !== null) {
       const minY = Math.min(
         ...container.list.map((s) => (s as Phaser.GameObjects.Sprite).y),
       );
-      outsideSprite.y = minY - this.symbolHeight - this.symbolsYSpacing;
+
+      (outsideSprite as Phaser.GameObjects.Sprite).y =
+        minY - this.symbolHeight - this.symbolsYSpacing;
     }
   }
 }

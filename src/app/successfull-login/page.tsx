@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 export default function SuccessfullLoginPage() {
@@ -24,7 +25,7 @@ export default function SuccessfullLoginPage() {
     <div>
       <p>Hello from success!</p>
       <p>Username: {username}</p>
-      <img src={photo} alt="User Photo" />
+      <Image src={photo} alt="User Photo" />
     </div>
   );
 }

@@ -1,10 +1,10 @@
 'use client';
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, useEffect } from 'react';
 import { useMachine, useSelector } from '@xstate/react';
-import { slotMachine } from './fsm/StateMachine';
-import sendBetAndWait from './fsm/sendBetActor';
-import { slotAPI } from './PhaserService';
+import { slotMachine } from '@/game/fsm/StateMachine';
+import sendBetAndWait from '@/game/fsm/sendBetActor';
 import { ActorRefFrom } from 'xstate';
+import { slotAPI } from '@/game/components/PhaserService';
 
 export const SlotMachineContext = createContext<{
   state: any;

@@ -1,3 +1,5 @@
+import { WinningLines } from '@/lib/api/types';
+import log from '@/lib/logger';
 import { BlendModes, Scene } from 'phaser';
 
 export class WinLineDisplay {
@@ -37,7 +39,7 @@ export class WinLineDisplay {
     [0, 0, 0, 1, 2], // 20
   ];
 
-  winning_lines: { line: number; winning_symbol_count: number }[] = [];
+  private winning_lines: WinningLines = [];
 
   constructor(scene: Scene, symbols_count: number = 15) {
     this.scene = scene;
@@ -59,7 +61,7 @@ export class WinLineDisplay {
 
   setWinningLines(lines: typeof this.winning_lines) {
     this.winning_lines = [...lines];
-    console.log('WINNING LINESSSSSSSSSSSSS', this.winning_lines);
+    log.debug('WINNING LINES', this.winning_lines);
   }
 
   drawSymbolBoxes(count: number) {
@@ -118,7 +120,7 @@ export class WinLineDisplay {
     positions: number[];
     symbols_count: number;
   } {
-    let win_line_info = this.winning_lines[index % this.winning_lines.length];
+    const win_line_info = this.winning_lines[index % this.winning_lines.length];
     return {
       positions: this.lines[win_line_info.line],
       symbols_count: win_line_info.winning_symbol_count,
@@ -189,7 +191,7 @@ export class WinLineDisplay {
     this.scene.events.off('update', this.updateLine, this);
   }
 
-  private updateLine(time: number, delta: number) {
+  private updateLine(_time: number, delta: number) {
     if (!this.updateLineGraphics) return;
 
     this.updateProgress += delta / this.updateDuration;

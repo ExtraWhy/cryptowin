@@ -1,13 +1,15 @@
-import WebSocketManager, { ServerMessage } from '@/lib/ws';
-import { Scene, Display } from 'phaser';
-import Stats from 'stats.js';
-import { EventBus } from '../EventBus';
+import type StatsType from 'stats.js';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Stats = require('stats.js') as typeof StatsType;
+import { Scene } from 'phaser';
+import { EventBus } from '@/game/components/EventBus';
 import { ReelsManager } from '@/game/components/Reeling';
 import { BetResult } from '@/lib/api/types';
 import { WinLineDisplay } from '../components/WinLineDisplay';
+
 export class BaseSlotScene extends Scene {
   public reeling!: ReelsManager;
-  public winlines: WinLineDisplay;
+  public winlines!: WinLineDisplay;
   public onUpdate: (() => void) | null = null;
 
   private stats = new Stats();
@@ -38,7 +40,7 @@ export class BaseSlotScene extends Scene {
   }
 
   handleBetResult(data: BetResult) {
-    console.log('phaser bet result receive', data);
+    //log.debug('phaser bet result receive', data);
     this.reeling.drawWinningSymbols(data.symbols);
     this.winlines.setWinningLines(data.lines);
   }

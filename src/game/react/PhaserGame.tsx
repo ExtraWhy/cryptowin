@@ -1,8 +1,8 @@
 'use client';
 import { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
-import StartGame from './main';
-import { EventBus } from './EventBus';
-import { registerScene } from './PhaserService';
+import StartGame from '@/game/main';
+import { EventBus } from '@/game/components/EventBus';
+import { registerScene } from '@/game/components/PhaserService';
 
 export default function GameWrapper() {
   return <PhaserGame />;

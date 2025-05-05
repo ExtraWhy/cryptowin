@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Coins } from 'lucide-react';
 import AuthTrigger from '@/components/AuthTrigger';
+import Image from 'next/image';
 
 export default function Header() {
   const [username, setUsername] = useState('none');
@@ -31,12 +32,16 @@ export default function Header() {
       </div>
       {username === 'none' ? null : username ? (
         <div className="flex items-center gap-2 ml-auto mr-4">
-          <img src={photo} className="w-8 h-8 rounded-full" alt="User" />
+          <Image src={photo} className="w-8 h-8 rounded-full" alt="User" />
           <span className="text-sm font-medium">{username}</span>
         </div>
       ) : (
         <>
-          <AuthTrigger text="Login" variant="outline" className="ml-auto mr-2" />
+          <AuthTrigger
+            text="Login"
+            variant="outline"
+            className="ml-auto mr-2"
+          />
           <AuthTrigger text="Sign Up" className="mr-2 md:mr-[2vw]" />
         </>
       )}

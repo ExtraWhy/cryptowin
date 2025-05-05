@@ -29,11 +29,12 @@ export interface BetRequest {
 
 // frontend app’s clean domain models (used by both WS & REST)
 
+export type WinningLines = { line: number; winning_symbol_count: number }[];
 export interface BetResult {
   id: string;
   betAmount: number;
   winAmount: number;
-  lines: {}[];
+  lines: WinningLines;
   symbols: number[][];
 }
 
