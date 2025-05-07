@@ -4,7 +4,7 @@ interface LogConfig {
   style: string;
 }
 
-const consoleMethods: Record<LogLevel, (...args: any[]) => void> = {
+const consoleMethods: Record<LogLevel, (...args: unknown[]) => void> = {
   info: console.info,
   debug: console.debug,
   warn: console.warn,
@@ -42,16 +42,19 @@ const logStyles: Record<LogLevel, LogConfig> = {
 
 function createLogger(level: LogLevel) {
   const { label, style } = logStyles[level];
-  const method: any = consoleMethods[level];
+  const method: (...args: unknown[]) => void = consoleMethods[level];
 
   return (...args: unknown[]) => {
     const styledParts: string[] = [];
     const unstyledParts: unknown[] = [];
 
     for (const arg of args) {
-      typeof arg === 'string' ? styledParts.push(arg) : unstyledParts.push(arg);
+      if (typeof arg === 'string') {
+        styledParts.push(arg);
+      } else {
+        unstyledParts.push(arg);
+      }
     }
-
     const styledMessage = `${label} ${styledParts.join(' ')}`;
     method(`%c${styledMessage}`, style, ...unstyledParts);
   };

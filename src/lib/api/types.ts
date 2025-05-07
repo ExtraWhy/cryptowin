@@ -10,7 +10,7 @@ import { ServerMessage } from '../ws';
 export interface CleoEntry {
   Pay?: number;
   Mult?: number;
-  Num: number[];
+  Num: number;
   Line?: number;
   XY: number[];
 }

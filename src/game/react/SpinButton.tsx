@@ -1,6 +1,7 @@
 import Image from 'next/image';
+import { SendProp } from './SlotMachineProvider';
 
-export default function SpinButton({ send }: { send: (e: any) => any }) {
+export default function SpinButton({ send }: SendProp) {
   return (
     <div className="absolute w-[calc(100%-2.9rem)] h-21 bottom-0 bg-[#1B1913] border-[#272625] border-1 my-3 mx-5 rounded-sm">
       <div

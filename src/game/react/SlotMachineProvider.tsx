@@ -1,15 +1,18 @@
 'use client';
 import { createContext, useEffect } from 'react';
 import { useMachine, useSelector } from '@xstate/react';
-import { slotMachine } from '@/game/fsm/StateMachine';
+import { SLOT_EVENTS, SlotContext, slotMachine } from '@/game/fsm/StateMachine';
 import sendBetAndWait from '@/game/fsm/sendBetActor';
-import { ActorRefFrom } from 'xstate';
+import { ActorRefFrom, SnapshotFrom } from 'xstate';
 import { slotAPI } from '@/game/components/PhaserService';
+import { BetResult } from '@/lib/api/types';
 
 export const SlotMachineContext = createContext<{
-  state: any;
-  send: (event: any) => void;
+  state: SnapshotFrom<typeof machine>;
+  send: (event: SLOT_EVENTS) => void;
 } | null>(null);
+
+export type SendProp = { send: (event: SLOT_EVENTS) => void };
 
 const machine = slotMachine(slotAPI, { sendBetAndWait: sendBetAndWait });
 
@@ -37,17 +40,17 @@ export const SlotMachineProvider = ({
   );
 };
 
-export const useGameState = (): any => {
+export const useGameState = (): SlotContext['game'] => {
   return useSelector(_machine_ref, (snapshot) => snapshot.context.game);
 };
-export const useBetResult = (): any => {
+export const useBetResult = (): BetResult | null => {
   return useSelector(
     _machine_ref,
     (snapshot) => snapshot.context.game?.betResult,
   );
 };
 
-export const useSend = (): any => {
+export const useSend = (): ((event: SLOT_EVENTS) => void) => {
   return _machine_ref.send;
 };
 

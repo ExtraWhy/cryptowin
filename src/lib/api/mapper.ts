@@ -14,7 +14,7 @@ export function mapDtoToBetResult(dto: BetServerResponse): BetResult {
       (entry): entry is Required<Pick<CleoEntry, 'Line'>> & CleoEntry =>
         typeof entry.Line === 'number',
     )
-    .map((entry: any) => ({
+    .map((entry: Required<Pick<CleoEntry, 'Line' | 'Num'>> & CleoEntry) => ({
       line: entry.Line - 1,
       winning_symbol_count: entry.Num,
     }));

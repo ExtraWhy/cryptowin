@@ -6,7 +6,7 @@ import { fromPromise } from 'xstate';
 export const ws = WebSocketManager();
 ws.connect();
 
-const presolve: ((msg: BetResult) => void) | null = null;
+let presolve: ((msg: BetResult) => void) | null = null;
 
 ws.onMessage((data: ServerMessage) => {
   if (presolve) {

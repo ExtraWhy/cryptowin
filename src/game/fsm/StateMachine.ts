@@ -10,6 +10,37 @@ export const SLOT_STATES = {
   stopping: 'stopping',
   stopped: 'stopped',
   show_line_wins: 'show_line_wins',
+} as const;
+
+export type SlotState = (typeof SLOT_STATES)[keyof typeof SLOT_STATES];
+
+export type SLOT_EVENTS =
+  | { type: 'TOGGLE' }
+  | { type: 'TOGGLE_AUTOPLAY' }
+  | { type: 'STOP_SPIN' }
+  | { type: 'STOP_COMPLETE' }
+  | { type: 'RESET_COMPLETE' }
+  | { type: 'RESULT_RECEIVED' }
+  | { type: 'SHOW_WIN' }
+  | { type: 'AUTOPLAY_TOGGLE' };
+
+export type SlotContext = {
+  socket_api: {
+    bet_request: BetRequest;
+  };
+  player: {
+    balance: number;
+    current_bet: number;
+    last_win: number;
+  };
+  game: {
+    betResult: BetResult | null;
+    freeSpinsRemaining: number;
+    autoPlayEnabled: boolean;
+  };
+  session: { sessionId: number };
+  count: number;
+  updateFunc: (() => void) | null;
 };
 
 export const slotMachine = (
@@ -26,33 +57,8 @@ export const slotMachine = (
 ) =>
   setup({
     types: {
-      context: {} as {
-        socket_api: {
-          bet_request: BetRequest;
-        };
-        player: {
-          balance: number;
-          current_bet: number;
-          last_win: number;
-        };
-        game: {
-          betResult: BetResult | null;
-          freeSpinsRemaining: number;
-          autoPlayEnabled: boolean;
-        };
-        session: { sessionId: number };
-        count: number;
-        updateFunc: (() => void) | null;
-      },
-      events: {} as
-        | { type: 'TOGGLE' }
-        | { type: 'TOGGLE_AUTOPLAY' }
-        | { type: 'STOP_SPIN' }
-        | { type: 'STOP_COMPLETE' }
-        | { type: 'RESET_COMPLETE' }
-        | { type: 'RESULT_RECEIVED' }
-        | { type: 'SHOW_WIN' }
-        | { type: 'AUTOPLAY_TOGGLE' },
+      context: {} as SlotContext,
+      events: {} as SLOT_EVENTS,
     },
     actors: external_actors,
     actions: {
@@ -71,7 +77,7 @@ export const slotMachine = (
       }),
     },
     guards: {
-      hasLineWins: ({ context }: any) =>
+      hasLineWins: ({ context }: { context: SlotContext }) =>
         Array.isArray(context.game?.betResult?.lines) &&
         context.game.betResult.lines.length > 0,
     },
@@ -123,7 +129,13 @@ export const slotMachine = (
                     socket_api.bet_request,
                   onDone: {
                     actions: assign({
-                      game: ({ context, event }: any) => ({
+                      game: ({
+                        context,
+                        event,
+                      }: {
+                        context: SlotContext;
+                        event: { type: string; output: BetResult };
+                      }) => ({
                         ...context.game,
                         betResult: event.output,
                       }),
@@ -170,12 +182,14 @@ export const slotMachine = (
         after: {
           1500: {
             target: SLOT_STATES.stopping,
-            guard: ({ context }: any) => !context.game.autoPlayEnabled,
+            guard: ({ context }: { context: SlotContext }) =>
+              !context.game.autoPlayEnabled,
           },
         },
         always: [
           {
-            guard: ({ context }: any) => context.game.autoPlayEnabled,
+            guard: ({ context }: { context: SlotContext }) =>
+              context.game.autoPlayEnabled,
             target: SLOT_STATES.spinning_autoplay,
           },
         ],
