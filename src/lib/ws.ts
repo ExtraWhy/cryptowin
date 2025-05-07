@@ -1,7 +1,7 @@
 // websocket.ts
 import { WS_URL } from '@/lib/api/api';
 import log from '@/lib/logger';
-export type ServerMessage = {};
+export type ServerMessage = Record<string, unknown>;
 
 let socket: WebSocket | null = null;
 let listener: ((data: ServerMessage) => void) | null = null;

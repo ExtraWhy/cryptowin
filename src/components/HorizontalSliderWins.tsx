@@ -1,6 +1,10 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
-import { useKeenSlider, KeenSliderPlugin } from 'keen-slider/react';
+import {
+  useKeenSlider,
+  KeenSliderPlugin,
+  TrackDetails,
+} from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
 import { CircleDollarSign } from 'lucide-react';
 import { getPlayers } from '@/lib/api/players';
@@ -48,7 +52,9 @@ export default function PlayerWinsSlider({}) {
   const wins = useRef<PlayerWin[]>([]);
   const players_filled = useRef<boolean>(false);
   const batch_id = useRef<number>(0);
-  const [slideDetails, setSlidesDetails] = useState<any>(null);
+  const [slideDetails, setSlidesDetails] = useState<
+    TrackDetails['slides'] | null
+  >(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {

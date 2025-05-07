@@ -11,13 +11,15 @@ export interface Reel {
   stopResolve?: () => void;
 }
 
+/* eslint-disable @typescript-eslint/no-namespace */
 declare module 'phaser' {
   namespace GameObjects {
-    interface Sprite {
+    export interface Sprite {
       stopPosition?: number | null;
     }
   }
 }
+/* eslint-enable @typescript-eslint/no-namespace */
 
 export class ReelsManager {
   // ===  defaults you had as top-level constants ===
@@ -339,9 +341,15 @@ export class ReelsManager {
     return shouldFinish;
   }
 
-  private tweenPromise(params: any): Promise<void> {
+  private tweenPromise(
+    params:
+      | Phaser.Types.Tweens.TweenBuilderConfig
+      | Phaser.Types.Tweens.TweenChainBuilderConfig
+      | Phaser.Tweens.Tween
+      | Phaser.Tweens.TweenChain,
+  ): Promise<void> {
     return new Promise((resolve) => {
-      params.onComplete = () => resolve();
+      params.onCompleteHandler = () => resolve();
       this.scene.tweens.add(params);
     });
   }

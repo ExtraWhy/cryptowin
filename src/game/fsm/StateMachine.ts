@@ -42,7 +42,7 @@ export const slotMachine = (
         };
         session: { sessionId: number };
         count: number;
-        updateFunc: (() => {}) | null;
+        updateFunc: (() => void) | null;
       },
       events: {} as
         | { type: 'TOGGLE' }

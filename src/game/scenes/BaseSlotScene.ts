@@ -1,6 +1,4 @@
-import type StatsType from 'stats.js';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const Stats = require('stats.js') as typeof StatsType;
+import Stats from 'stats.js';
 import { Scene } from 'phaser';
 import { EventBus } from '@/game/components/EventBus';
 import { ReelsManager } from '@/game/components/Reeling';
