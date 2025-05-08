@@ -344,12 +344,10 @@ export class ReelsManager {
   private tweenPromise(
     params:
       | Phaser.Types.Tweens.TweenBuilderConfig
-      | Phaser.Types.Tweens.TweenChainBuilderConfig
-      | Phaser.Tweens.Tween
-      | Phaser.Tweens.TweenChain,
+      | Phaser.Types.Tweens.TweenChainBuilderConfig,
   ): Promise<void> {
     return new Promise((resolve) => {
-      params.onCompleteHandler = () => resolve();
+      params.onComplete = () => resolve();
       this.scene.tweens.add(params);
     });
   }
