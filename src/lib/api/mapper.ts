@@ -5,16 +5,16 @@ import {
   BetRequest,
   PlayerWin,
   PlayerData,
-  CleoEntry,
+  SlotEntry,
 } from './types';
 
 export function mapDtoToBetResult(dto: BetServerResponse): BetResult {
-  const lines = dto.cleo
+  const lines = dto.slot
     .filter(
-      (entry): entry is Required<Pick<CleoEntry, 'Line'>> & CleoEntry =>
+      (entry): entry is Required<Pick<SlotEntry, 'Line'>> & SlotEntry =>
         typeof entry.Line === 'number',
     )
-    .map((entry: Required<Pick<CleoEntry, 'Line' | 'Num'>> & CleoEntry) => ({
+    .map((entry: Required<Pick<SlotEntry, 'Line' | 'Num'>> & SlotEntry) => ({
       line: entry.Line - 1,
       winning_symbol_count: entry.Num,
     }));

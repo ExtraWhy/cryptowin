@@ -7,7 +7,7 @@ import { ServerMessage } from '../ws';
 // WS command “bet” response
 //
 
-export interface CleoEntry {
+export interface SlotEntry {
   Pay?: number;
   Mult?: number;
   Num: number;
@@ -17,7 +17,7 @@ export interface CleoEntry {
 
 export interface BetServerResponse extends ServerMessage {
   win_amount: number;
-  cleo: CleoEntry[];
+  slot: SlotEntry[];
   Scr: number[][];
 }
 
