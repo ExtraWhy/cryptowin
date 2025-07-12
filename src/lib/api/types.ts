@@ -24,6 +24,7 @@ export interface BetServerResponse extends ServerMessage {
 // WS “place a bet” request
 export interface BetRequest {
   id: number;
+  gid: number;
   money: number;
 }
 

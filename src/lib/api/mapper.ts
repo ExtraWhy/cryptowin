@@ -28,8 +28,8 @@ export function mapDtoToBetResult(dto: BetServerResponse): BetResult {
   };
 }
 
-export function mapDtoToBetRequest(id: number, money: number): BetRequest {
-  return { id: id, money: money };
+export function mapDtoToBetRequest(id: number, gid: number, money: number): BetRequest {
+  return { id: id, gid: gid,money: money };
 }
 
 export function mapDtoToPlayerWin(data: PlayerData): PlayerWin {

@@ -87,7 +87,7 @@ export const slotMachine = (
     context: {
       count: 0,
       updateFunc: null,
-      socket_api: { bet_request: mapDtoToBetRequest(1, 100) },
+      socket_api: { bet_request: mapDtoToBetRequest(1, 2, 100) },
       player: { balance: 0, current_bet: 0, last_win: 0 },
       game: { betResult: null, freeSpinsRemaining: 0, autoPlayEnabled: false },
       session: { sessionId: 0 },
